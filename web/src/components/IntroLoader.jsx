@@ -34,14 +34,14 @@ export default function IntroLoader() {
       setPhase('move')
     }, 1700)
 
-    // 2) AFTER the logo has settled on the left, wipe the black screen up
-    const t2 = setTimeout(() => setPhase('wipe'), 3100)
+    // 2) once the logo has moved a little up, START wiping the black screen up (slight overlap)
+    const t2 = setTimeout(() => setPhase('wipe'), 2250)
 
     // 3) remove once the wipe is done
     const t3 = setTimeout(() => {
       document.body.style.overflow = ''
       setShow(false)
-    }, 4400)
+    }, 3600)
 
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); document.body.style.overflow = '' }
   }, [])
