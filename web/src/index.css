@@ -267,6 +267,15 @@ img { display: block; max-width: 100%; }
 .pinline-scroll.dragging { cursor: grabbing; }
 .ph-panel { height: 100%; flex: 0 0 auto; display: flex; flex-direction: column; justify-content: center; }
 .ph-image { }
+
+/* Phone: name goes ON TOP (not left), image + details scroll horizontally below */
+@media (max-width: 720px) {
+  .pitem.open { height: 66vh; }
+  .pinline { flex-direction: column; gap: 12px; }
+  .pinline-name-col { flex: 0 0 auto; width: 100%; justify-content: flex-start; padding-top: 4px; }
+  .pinline-name-col h2 { font-size: clamp(22px, 6vw, 30px); }
+  .pinline-scroll { flex: 1 1 auto; min-height: 0; width: 100%; }
+}
 .ph-image img { height: 100%; width: auto; max-width: none; object-fit: cover; user-select: none; -webkit-user-drag: none; }
 .ph-intro { width: min(72vw, 460px); }
 .ph-specs { }
