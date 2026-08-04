@@ -1,10 +1,12 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
-// big.dk-style intro: logo centred on a black screen, then in ONE motion the black
-// curtain lifts UP while the logo flies up-and-LEFT into the navbar spot (top-left).
+// big.dk-style intro:
+//  1) logo centred on a black screen
+//  2) the logo visibly travels UP-and-LEFT into the navbar spot (black still there)
+//  3) once it's sitting at top-left, the black curtain lifts UP to reveal the site
 export default function IntroLoader() {
   const [show, setShow] = useState(true)
-  const [go, setGo] = useState(false)
+  const [lift, setLift] = useState(false)   // curtain up + logo turns dark
   const logoRef = useRef(null)
 
   // place the logo dead-centre instantly (no transition) before first paint
@@ -21,28 +23,30 @@ export default function IntroLoader() {
     document.body.style.overflow = 'hidden'
     const el = logoRef.current
 
-    // hold, then: lift the black curtain UP + fly the logo up-left into the navbar together
+    // (1) hold, then fly the logo UP-LEFT into the navbar — black stays, so it's clearly visible
     const t1 = setTimeout(() => {
       if (el) {
-        el.style.transition = 'transform 1.15s cubic-bezier(.76, 0, .24, 1), filter .9s ease'
+        el.style.transition = 'transform 1.1s cubic-bezier(.76, 0, .24, 1), filter .7s ease'
         const target = document.querySelector('.brand-logo')?.getBoundingClientRect()
         if (target && el.offsetHeight) {
           const s = target.height / el.offsetHeight
           el.style.transform = `translate(${target.left}px, ${target.top}px) scale(${s})`
         }
       }
-      setGo(true)
-    }, 1300)
+    }, 1000)
 
-    const t2 = setTimeout(() => { document.body.style.overflow = ''; setShow(false) }, 2600)
-    return () => { clearTimeout(t1); clearTimeout(t2); document.body.style.overflow = '' }
+    // (2) once the logo is seated at top-left, lift the black curtain to reveal the site
+    const t2 = setTimeout(() => setLift(true), 2250)
+
+    const t3 = setTimeout(() => { document.body.style.overflow = ''; setShow(false) }, 3450)
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); document.body.style.overflow = '' }
   }, [])
 
   if (!show) return null
   return (
     <>
-      <div className={`intro ${go ? 'up' : ''}`} aria-hidden="true" />
-      <img ref={logoRef} className={`intro-logo ${go ? 'go' : ''}`} src="/logo.png" alt="" />
+      <div className={`intro ${lift ? 'up' : ''}`} aria-hidden="true" />
+      <img ref={logoRef} className={`intro-logo ${lift ? 'go' : ''}`} src="/logo.png" alt="" />
     </>
   )
 }
