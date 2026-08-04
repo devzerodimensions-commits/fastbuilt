@@ -255,8 +255,9 @@ img { display: block; max-width: 100%; }
 .pinline-scroll::-webkit-scrollbar { display: none; height: 0; }
 .pinline-scroll.dragging { cursor: grabbing; }
 .ph-panel { height: 100%; flex: 0 0 auto; display: flex; flex-direction: column; justify-content: center; }
-/* hero slide = image's own width, right after the name (no big empty gaps) */
+/* hero slide = image's own width, right after the name (a little breathing space on its left) */
 .ph-hero { flex: 0 0 auto; flex-direction: row; align-items: center; justify-content: flex-start; }
+.pinline-scroll > .ph-hero:first-child { margin-left: clamp(24px, 5vw, 96px); }
 .ph-hero img { height: 100%; width: auto; max-width: none; backface-visibility: hidden; }
 
 /* Phone: name goes ON TOP (not left), image + details scroll horizontally below */
