@@ -513,26 +513,32 @@ img { display: block; max-width: 100%; }
 @media (pointer: coarse) { .cursor { display: none; } }
 
 /* ===================== INTRO LOADER (big.dk-style) ===================== */
-/* big.dk-style curtain: black screen + centred logo, then the whole thing slides UP */
+/* big.dk-style intro: black curtain lifts UP while the logo flies up-left into the navbar */
 .intro {
   position: fixed; inset: 0; z-index: 1000;
   background: #111;
-  display: flex; align-items: center; justify-content: center;
   transform: translateY(0);
   transition: transform 1.15s cubic-bezier(.76, 0, .24, 1);
   will-change: transform;
+  pointer-events: none;
 }
-.intro.up { transform: translateY(-100%); }            /* curtain lifts, revealing the site + navbar logo */
+.intro.up { transform: translateY(-100%); }            /* curtain lifts, revealing the site */
 .intro-logo {
+  position: fixed; top: 0; left: 0;
   width: clamp(200px, 42vw, 380px);
+  z-index: 1001;
+  transform-origin: top left;
   filter: invert(1);                                   /* white wordmark on the black screen */
   opacity: 0;
-  animation: introLogoIn .7s ease .1s forwards;
+  animation: introLogoIn .6s ease forwards;
+  will-change: transform;                              /* transform driven by JS (centre -> navbar) */
+  pointer-events: none;
 }
 @keyframes introLogoIn { to { opacity: 1; } }
+.intro-logo.go { filter: invert(0); }                  /* becomes the dark navbar logo as it lands */
 
 @media (prefers-reduced-motion: reduce) {
-  .intro { display: none; }
+  .intro, .intro-logo { display: none; }
 }
 
 /* ===================== PAGE TRANSITION (wipe) ===================== */
