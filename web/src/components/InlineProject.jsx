@@ -19,12 +19,32 @@ export default function InlineProject({ project: p, flipFrom, onClose }) {
 
   // FLIP: morph the SAME image from the clicked thumbnail's rect -> its open rect
   // (grows in place, no swap/pause) and colourise B&W -> colour during the move.
+  // page-centre the first image (once) — keep it as a ref so resize can reuse it
+  const centreImage = () => {
+    const el = ref.current
+    if (!el) return
+    const heroPanel = el.querySelector('.ph-hero')
+    const img = heroPanel && heroPanel.querySelector('img')
+    if (!heroPanel || !img) return
+    heroPanel.style.marginLeft = '0px'
+    let stripLeft = 0
+    for (let n = el; n; n = n.offsetParent) stripLeft += n.offsetLeft
+    const imgW = img.getBoundingClientRect().width ||
+      (window.innerHeight * 0.56) * (img.naturalWidth / img.naturalHeight || 1.4)
+    heroPanel.style.marginLeft = Math.max(0, window.innerWidth / 2 - imgW / 2 - stripLeft) + 'px'
+    el.scrollLeft = 0
+  }
+
+  // FLIP: page-centre the image, then morph the SAME image from the thumbnail rect
+  // to that centred position (grows in place) + colourise B&W -> colour.
   useLayoutEffect(() => {
     const el = ref.current
     if (!el) return
     const img = el.querySelector('.ph-hero img')
     if (!img) return
-    const last = img.getBoundingClientRect()
+    img.style.transform = 'none'
+    centreImage()                                  // sets margin-left so image is page-centred
+    const last = img.getBoundingClientRect()       // centred open rect
     let fromTransform = 'none'
     if (flipFrom && last.width) {
       const dx = flipFrom.left - last.left
@@ -41,7 +61,8 @@ export default function InlineProject({ project: p, flipFrom, onClose }) {
       ],
       { duration: 1000, easing: 'cubic-bezier(.22,.61,.36,1)', fill: 'both' }
     )
-    return () => { try { anim.cancel() } catch {} }
+    window.addEventListener('resize', centreImage)
+    return () => { try { anim.cancel() } catch {}; window.removeEventListener('resize', centreImage) }
   }, [flipFrom])
 
   useEffect(() => {
