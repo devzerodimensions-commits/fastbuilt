@@ -59,7 +59,7 @@ export default function InlineProject({ project: p, flipFrom, onClose }) {
         { transform: fromTransform, filter: 'grayscale(1)' },
         { transform: 'none', filter: 'grayscale(0)' },
       ],
-      { duration: 1000, easing: 'cubic-bezier(.22,.61,.36,1)', fill: 'both' }
+      { duration: 1500, easing: 'cubic-bezier(.22,.61,.36,1)', fill: 'both' }
     )
     window.addEventListener('resize', centreImage)
     return () => { try { anim.cancel() } catch {}; window.removeEventListener('resize', centreImage) }

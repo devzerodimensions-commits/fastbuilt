@@ -62,7 +62,7 @@ export default function Home() {
       const vh = window.innerHeight
       const finalH = vh * 0.56
       const targetY = Math.max(0, absTop - headerH - Math.max(0, (vh - headerH - finalH) / 2))
-      if (window.__lenis) window.__lenis.scrollTo(targetY, { duration: 0.9 })
+      if (window.__lenis) window.__lenis.scrollTo(targetY, { duration: 1.2 })
       else window.scrollTo({ top: targetY, behavior: 'smooth' })
     }, 30)
     return () => clearTimeout(t)
