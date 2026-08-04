@@ -1,31 +1,35 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
-// big.dk-style intro: logo appears centred on a black screen, then flies to the
+// big.dk-style intro: logo shows CENTRED on a black screen first, then flies to the
 // top-left (into the navbar) while the black screen wipes upward to reveal the site.
-// Plays once per browser session.
 export default function IntroLoader() {
   const [show, setShow] = useState(true)     // plays on every page load
   const [phase, setPhase] = useState('in')   // 'in' -> 'move'
   const logoRef = useRef(null)
 
+  // place the logo at the centre INSTANTLY (no transition) so it appears centred first
+  useLayoutEffect(() => {
+    const el = logoRef.current
+    if (!el) return
+    el.style.transition = 'none'
+    const w = el.offsetWidth, h = el.offsetHeight
+    el.style.transform = `translate(${(window.innerWidth - w) / 2}px, ${(window.innerHeight - h) / 2}px)`
+    el.getBoundingClientRect()   // commit the centred position before any transition
+  }, [])
+
   useEffect(() => {
-    if (!show) return
     document.body.style.overflow = 'hidden'
     const el = logoRef.current
 
-    const centre = () => {
-      if (!el) return
-      const w = el.offsetWidth, h = el.offsetHeight
-      el.style.transform = `translate(${(window.innerWidth - w) / 2}px, ${(window.innerHeight - h) / 2}px) scale(1)`
-    }
-    centre()
-
-    // move logo into the navbar + wipe the black screen up
+    // after a beat: enable the transition and fly the logo into the navbar + wipe bg up
     const t1 = setTimeout(() => {
-      const target = document.querySelector('.brand-logo')?.getBoundingClientRect()
-      if (el && target && el.offsetHeight) {
-        const s = target.height / el.offsetHeight
-        el.style.transform = `translate(${target.left}px, ${target.top}px) scale(${s})`
+      if (el) {
+        el.style.transition = 'transform .95s cubic-bezier(.76,0,.24,1), filter .6s ease'
+        const target = document.querySelector('.brand-logo')?.getBoundingClientRect()
+        if (target && el.offsetHeight) {
+          const s = target.height / el.offsetHeight
+          el.style.transform = `translate(${target.left}px, ${target.top}px) scale(${s})`
+        }
       }
       setPhase('move')
     }, 1200)
@@ -33,10 +37,10 @@ export default function IntroLoader() {
     const t2 = setTimeout(() => {
       document.body.style.overflow = ''
       setShow(false)
-    }, 2200)
+    }, 2250)
 
     return () => { clearTimeout(t1); clearTimeout(t2); document.body.style.overflow = '' }
-  }, [show])
+  }, [])
 
   if (!show) return null
   return (
