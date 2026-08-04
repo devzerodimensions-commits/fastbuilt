@@ -24,7 +24,7 @@ export default function IntroLoader() {
     // after a beat: enable the transition and fly the logo into the navbar + wipe bg up
     const t1 = setTimeout(() => {
       if (el) {
-        el.style.transition = 'transform .95s cubic-bezier(.76,0,.24,1), filter .6s ease'
+        el.style.transition = 'transform 1.3s cubic-bezier(.76,0,.24,1), filter .8s ease'
         const target = document.querySelector('.brand-logo')?.getBoundingClientRect()
         if (target && el.offsetHeight) {
           const s = target.height / el.offsetHeight
@@ -32,12 +32,12 @@ export default function IntroLoader() {
         }
       }
       setPhase('move')
-    }, 1200)
+    }, 1700)
 
     const t2 = setTimeout(() => {
       document.body.style.overflow = ''
       setShow(false)
-    }, 2250)
+    }, 3100)
 
     return () => { clearTimeout(t1); clearTimeout(t2); document.body.style.overflow = '' }
   }, [])
