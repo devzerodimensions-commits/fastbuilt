@@ -4,7 +4,7 @@ import Footer from '../components/Footer'
 import CategoryIcon from '../components/CategoryIcon'
 import InlineProject from '../components/InlineProject'
 import useHomeMotion from '../lib/useHomeMotion'
-import { fetchProjects, imgBW, imgLQIP } from '../lib/projects'
+import { fetchProjects, imgBW, imgColor, imgLQIP } from '../lib/projects'
 
 export default function Home() {
   const [projects, setProjects] = useState([])
@@ -18,6 +18,11 @@ export default function Home() {
     fetchProjects().then((p) => {
       setProjects(p)
       setLoading(false)
+      // preload the full-colour images so opening a project never flashes/blank
+      p.forEach((pr) => {
+        const im = new Image(); im.src = imgColor(pr.image)
+        if (pr.image2) { const im2 = new Image(); im2.src = imgColor(pr.image2) }
+      })
     })
   }, [])
 

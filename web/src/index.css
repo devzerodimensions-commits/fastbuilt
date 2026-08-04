@@ -228,12 +228,16 @@ img { display: block; max-width: 100%; }
 .pitem.open .prow { display: none; }   /* hide compact row when open */
 .pitem.open .pinline {
   transform-origin: center top;
-  animation: growOpen .8s cubic-bezier(.22,.61,.36,1);   /* clear, smooth grow — no opacity blink */
+  will-change: transform;
+  backface-visibility: hidden;
+  animation: growOpen .7s cubic-bezier(.16,.84,.44,1) both;   /* smooth GPU grow, no blink */
 }
 @keyframes growOpen {
-  from { transform: scale(.6); }
-  to   { transform: scale(1); }
+  from { transform: scale(.8) translateZ(0); }
+  to   { transform: scale(1) translateZ(0); }
 }
+/* keep the open image steady & GPU-composited so it never flickers/disappears */
+.ph-image img { backface-visibility: hidden; transform: translateZ(0); }
 
 /* OPEN: horizontal strip starting at the heading; image sits in page centre */
 .pinline { height: 100%; }
