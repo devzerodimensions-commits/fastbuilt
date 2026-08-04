@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import CategoryIcon from './CategoryIcon'
 import { imgColor } from '../lib/projects'
 
@@ -13,9 +13,36 @@ const SPEC_FIELDS = [
 
 // Name/heading fixed on the left; the image is CSS-centred (flex) so it grows in
 // place at the centre — no left-shift/drift. Drag to scroll the info sideways.
-export default function InlineProject({ project: p, onClose }) {
+export default function InlineProject({ project: p, flipFrom, onClose }) {
   const ref = useRef(null)
   const movedRef = useRef(false)
+
+  // FLIP: morph the SAME image from the clicked thumbnail's rect -> its open rect
+  // (grows in place, no swap/pause) and colourise B&W -> colour during the move.
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const img = el.querySelector('.ph-hero img')
+    if (!img) return
+    const last = img.getBoundingClientRect()
+    let fromTransform = 'none'
+    if (flipFrom && last.width) {
+      const dx = flipFrom.left - last.left
+      const dy = flipFrom.top - last.top
+      const sx = flipFrom.width / last.width
+      const sy = flipFrom.height / last.height
+      fromTransform = `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`
+    }
+    img.style.transformOrigin = 'top left'
+    const anim = img.animate(
+      [
+        { transform: fromTransform, filter: 'grayscale(1)' },
+        { transform: 'none', filter: 'grayscale(0)' },
+      ],
+      { duration: 1000, easing: 'cubic-bezier(.22,.61,.36,1)', fill: 'both' }
+    )
+    return () => { try { anim.cancel() } catch {} }
+  }, [flipFrom])
 
   useEffect(() => {
     const el = ref.current

@@ -222,29 +222,12 @@ img { display: block; max-width: 100%; }
    the "grow" is a smooth scale so it can never collapse to 0. */
 .pitem.open {
   --open-h: 56vh;
-  height: var(--open-h);
+  height: var(--open-h);          /* final height set immediately; the FLIP morphs the image in place */
   overflow: hidden;
   margin: 14px 0 22px;
-  will-change: height;
-  contain: layout paint;
-  /* slow, gradual expand: neighbours push down as it opens */
-  animation: growOpen 1.1s cubic-bezier(.22, .61, .36, 1) forwards;
-}
-@keyframes growOpen {
-  from { height: var(--from-h, 0px); }   /* grow FROM the project's current (closed) size */
-  to   { height: var(--open-h); }
 }
 .pitem.open .prow { display: none; }   /* hide compact row when open */
-/* image grows from the centre AND colourises (B&W -> colour) seamlessly */
-.pitem.open .ph-hero img {
-  transform-origin: center center;
-  will-change: transform, filter;
-  animation: imgGrow 1.15s cubic-bezier(.22, .61, .36, 1) both;
-}
-@keyframes imgGrow {
-  from { transform: scale(.78); filter: grayscale(100%); }
-  to   { transform: scale(1);   filter: grayscale(0%); }
-}
+.pitem.open .ph-hero img { will-change: transform, filter; }
 
 /* OPEN: name overlays on the left (fixed); image is flex-centred so it grows in place */
 .pinline { position: relative; height: 100%; }
