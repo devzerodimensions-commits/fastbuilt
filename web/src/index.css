@@ -227,14 +227,24 @@ img { display: block; max-width: 100%; }
   margin: 14px 0 22px;
   will-change: height;
   contain: layout paint;
-  /* big.dk-style smooth expand: neighbours push down gradually */
-  animation: growOpen .85s cubic-bezier(.76, 0, .24, 1) forwards;
+  /* slow, gradual expand: neighbours push down as it opens */
+  animation: growOpen 1.1s cubic-bezier(.22, .61, .36, 1) forwards;
 }
 @keyframes growOpen {
   from { height: var(--from-h, 0px); }   /* grow FROM the project's current (closed) size */
   to   { height: var(--open-h); }
 }
 .pitem.open .prow { display: none; }   /* hide compact row when open */
+/* image itself grows slowly from the centre (clearly visible, no drift) */
+.pitem.open .ph-hero img {
+  transform-origin: center center;
+  will-change: transform;
+  animation: imgGrow 1.1s cubic-bezier(.22, .61, .36, 1) both;
+}
+@keyframes imgGrow {
+  from { transform: scale(.78); }
+  to   { transform: scale(1); }
+}
 
 /* OPEN: name overlays on the left (fixed); image is flex-centred so it grows in place */
 .pinline { position: relative; height: 100%; }
