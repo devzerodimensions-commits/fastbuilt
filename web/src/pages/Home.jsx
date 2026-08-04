@@ -10,6 +10,7 @@ export default function Home() {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [openSlug, setOpenSlug] = useState(null)
+  const [fromH, setFromH] = useState(0)   // closed height of the clicked project (grow starts from here)
   const [params] = useSearchParams()
   const active = params.get('cat') || 'All'
   const scaleRef = useRef(null)
@@ -37,6 +38,15 @@ export default function Home() {
   useHomeMotion(scaleRef, [loading, active, filtered.length])
 
   const toggle = (slug) => setOpenSlug((s) => (s === slug ? null : slug))
+
+  // capture the project's current (closed) height so it grows FROM that size
+  const onRowClick = (slug, e) => {
+    if (openSlug !== slug) {
+      const pit = e.currentTarget.closest('.pitem')
+      setFromH(pit ? pit.offsetHeight : 0)
+    }
+    toggle(slug)
+  }
 
   // when a project opens, smoothly centre it in the viewport (below the fixed header)
   useEffect(() => {
@@ -68,13 +78,17 @@ export default function Home() {
           {filtered.map((p, i) => {
             const open = p.slug === openSlug
             return (
-              <div className={`pitem ${open ? 'open' : ''}`} key={p.slug}>
+              <div
+                className={`pitem ${open ? 'open' : ''}`}
+                key={p.slug}
+                style={open ? { '--from-h': `${fromH}px` } : undefined}
+              >
                 <div
                   className={`prow ${open ? 'active' : ''}`}
                   role="button"
                   tabIndex={0}
-                  onClick={() => toggle(p.slug)}
-                  onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), toggle(p.slug))}
+                  onClick={(e) => onRowClick(p.slug, e)}
+                  onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), onRowClick(p.slug, e))}
                 >
                   <div className="pmeta">
                     <CategoryIcon category={p.category} />

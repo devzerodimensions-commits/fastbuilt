@@ -229,7 +229,7 @@ img { display: block; max-width: 100%; }
   animation: growOpen .85s cubic-bezier(.76, 0, .24, 1) forwards;
 }
 @keyframes growOpen {
-  from { height: 0; }
+  from { height: var(--from-h, 0px); }   /* grow FROM the project's current (closed) size */
   to   { height: var(--open-h); }
 }
 .pitem.open .prow { display: none; }   /* hide compact row when open */
