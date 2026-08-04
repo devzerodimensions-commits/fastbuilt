@@ -54,17 +54,16 @@ export default function Home() {
     const t = setTimeout(() => {
       const el = document.querySelector('.pitem.open')
       if (!el) return
-      // use layout offsets (not getBoundingClientRect) so the grow-scale animation
-      // and the breathing transform don't distort the position
       let absTop = 0
       for (let n = el; n; n = n.offsetParent) absTop += n.offsetTop
       const headerH = 62
       const vh = window.innerHeight
-      const finalH = vh * 0.56   // matches .pitem.open final height (grow animation)
-      const targetY = absTop - headerH - Math.max(0, (vh - headerH - finalH) / 2)
-      if (window.__lenis) window.__lenis.scrollTo(Math.max(0, targetY), { duration: 1 })
-      else window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' })
-    }, 80)
+      const finalH = vh * 0.56
+      const targetY = Math.max(0, absTop - headerH - Math.max(0, (vh - headerH - finalH) / 2))
+      // scroll in sync with the 0.85s grow so the two motions feel like one
+      if (window.__lenis) window.__lenis.scrollTo(targetY, { duration: 0.85 })
+      else window.scrollTo({ top: targetY, behavior: 'smooth' })
+    }, 20)
     return () => clearTimeout(t)
   }, [openSlug])
 

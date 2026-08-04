@@ -45,33 +45,32 @@ export default function InlineProject({ project: p, onClose }) {
     }
   }, [])
 
-  // keep the first image centred on the page as it grows (name column stays left)
+  // centre the first image on the page — computed ONCE (no per-frame reflow, so the grow stays buttery smooth)
   useEffect(() => {
     const el = ref.current
     if (!el) return
     const center = () => {
       const imgPanel = el.querySelector('.ph-image')
       if (!imgPanel) return
+      const img = imgPanel.querySelector('img')
       let stripLeft = 0
       for (let n = el; n; n = n.offsetParent) stripLeft += n.offsetLeft
-      const desiredImgLeft = window.innerWidth / 2 - imgPanel.offsetWidth / 2
-      imgPanel.style.marginLeft = Math.max(0, desiredImgLeft - stripLeft) + 'px'
+      // use the FINAL image width (natural aspect × final open height) so we don't
+      // have to wait for / track the grow animation
+      let finalW = imgPanel.offsetWidth
+      if (img && img.naturalWidth) {
+        finalW = (window.innerHeight * 0.56) * (img.naturalWidth / img.naturalHeight)
+      }
+      imgPanel.style.marginLeft = Math.max(0, window.innerWidth / 2 - finalW / 2 - stripLeft) + 'px'
+      el.scrollLeft = 0
     }
-    // recompute every frame during the ~0.85s grow so it stays centred throughout
-    let raf, start
-    const loop = (t) => {
-      if (start === undefined) start = t
-      center()
-      if (t - start < 1000) raf = requestAnimationFrame(loop)
-      else el.scrollLeft = 0
-    }
-    center()                                   // immediate (in case rAF is throttled)
-    raf = requestAnimationFrame(loop)
-    window.addEventListener('resize', center)
     const img = el.querySelector('.ph-image img')
-    if (img && !img.complete) img.addEventListener('load', center)
+    if (img && img.complete) center()
+    else if (img) img.addEventListener('load', center)
+    const t = setTimeout(center, 50)   // safety
+    window.addEventListener('resize', center)
     return () => {
-      cancelAnimationFrame(raf)
+      clearTimeout(t)
       window.removeEventListener('resize', center)
       if (img) img.removeEventListener('load', center)
     }

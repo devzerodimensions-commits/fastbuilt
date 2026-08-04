@@ -225,6 +225,8 @@ img { display: block; max-width: 100%; }
   height: var(--open-h);
   overflow: hidden;
   margin: 14px 0 22px;
+  will-change: height;
+  contain: layout paint;
   /* big.dk-style smooth expand: neighbours push down gradually */
   animation: growOpen .85s cubic-bezier(.76, 0, .24, 1) forwards;
 }
