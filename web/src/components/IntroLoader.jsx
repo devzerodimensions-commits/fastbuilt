@@ -23,23 +23,21 @@ export default function IntroLoader() {
     document.body.style.overflow = 'hidden'
     const el = logoRef.current
 
-    // (1) hold, then fly the logo UP-LEFT into the navbar — black stays, so it's clearly visible
+    // hold, then TOGETHER: fly the logo up-left into the navbar + lift the black curtain up
     const t1 = setTimeout(() => {
       if (el) {
-        el.style.transition = 'transform 1.1s cubic-bezier(.76, 0, .24, 1), filter .7s ease'
+        el.style.transition = 'transform 1.15s cubic-bezier(.76, 0, .24, 1), filter .8s ease'
         const target = document.querySelector('.brand-logo')?.getBoundingClientRect()
         if (target && el.offsetHeight) {
           const s = target.height / el.offsetHeight
           el.style.transform = `translate(${target.left}px, ${target.top}px) scale(${s})`
         }
       }
+      setLift(true)                                   // black starts moving up at the SAME moment
     }, 1000)
 
-    // (2) AS the logo is reaching the navbar (no pause), start lifting the black curtain
-    const t2 = setTimeout(() => setLift(true), 1950)
-
-    const t3 = setTimeout(() => { document.body.style.overflow = ''; setShow(false) }, 3250)
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); document.body.style.overflow = '' }
+    const t2 = setTimeout(() => { document.body.style.overflow = ''; setShow(false) }, 2400)
+    return () => { clearTimeout(t1); clearTimeout(t2); document.body.style.overflow = '' }
   }, [])
 
   if (!show) return null
