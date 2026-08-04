@@ -45,28 +45,33 @@ export default function InlineProject({ project: p, onClose }) {
     }
   }, [])
 
-  // centre the first image on the page (name column stays to its left)
+  // keep the first image centred on the page as it grows (name column stays left)
   useEffect(() => {
     const el = ref.current
     if (!el) return
     const center = () => {
       const imgPanel = el.querySelector('.ph-image')
       if (!imgPanel) return
-      imgPanel.style.marginLeft = '0px'
       let stripLeft = 0
       for (let n = el; n; n = n.offsetParent) stripLeft += n.offsetLeft
       const desiredImgLeft = window.innerWidth / 2 - imgPanel.offsetWidth / 2
-      const m = Math.max(0, desiredImgLeft - stripLeft)
-      imgPanel.style.marginLeft = m + 'px'
-      el.scrollLeft = 0
+      imgPanel.style.marginLeft = Math.max(0, desiredImgLeft - stripLeft) + 'px'
     }
-    const t = setTimeout(center, 140)
-    const t2 = setTimeout(center, 500)
+    // recompute every frame during the ~0.85s grow so it stays centred throughout
+    let raf, start
+    const loop = (t) => {
+      if (start === undefined) start = t
+      center()
+      if (t - start < 1000) raf = requestAnimationFrame(loop)
+      else el.scrollLeft = 0
+    }
+    center()                                   // immediate (in case rAF is throttled)
+    raf = requestAnimationFrame(loop)
     window.addEventListener('resize', center)
     const img = el.querySelector('.ph-image img')
     if (img && !img.complete) img.addEventListener('load', center)
     return () => {
-      clearTimeout(t); clearTimeout(t2)
+      cancelAnimationFrame(raf)
       window.removeEventListener('resize', center)
       if (img) img.removeEventListener('load', center)
     }

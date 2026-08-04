@@ -221,21 +221,18 @@ img { display: block; max-width: 100%; }
    starts with the NAME. Base height is always 60vh (so info always shows);
    the "grow" is a smooth scale so it can never collapse to 0. */
 .pitem.open {
-  height: 56vh;                 /* reserved immediately -> content never collapses, centering always correct */
+  --open-h: 56vh;
+  height: var(--open-h);
   overflow: hidden;
   margin: 14px 0 22px;
-}
-.pitem.open .prow { display: none; }   /* hide compact row when open */
-.pitem.open .pinline {
-  transform-origin: center top;
-  will-change: transform;
-  backface-visibility: hidden;
-  animation: growOpen .7s cubic-bezier(.16,.84,.44,1) both;   /* smooth GPU grow, no blink */
+  /* big.dk-style smooth expand: neighbours push down gradually */
+  animation: growOpen .85s cubic-bezier(.76, 0, .24, 1) forwards;
 }
 @keyframes growOpen {
-  from { transform: scale(.8) translateZ(0); }
-  to   { transform: scale(1) translateZ(0); }
+  from { height: 0; }
+  to   { height: var(--open-h); }
 }
+.pitem.open .prow { display: none; }   /* hide compact row when open */
 /* keep the open image steady & GPU-composited so it never flickers/disappears */
 .ph-image img { backface-visibility: hidden; transform: translateZ(0); }
 
@@ -270,7 +267,7 @@ img { display: block; max-width: 100%; }
 
 /* Phone: name goes ON TOP (not left), image + details scroll horizontally below */
 @media (max-width: 720px) {
-  .pitem.open { height: 66vh; }
+  .pitem.open { --open-h: 66vh; }
   .pinline { flex-direction: column; gap: 12px; }
   .pinline-name-col { flex: 0 0 auto; width: 100%; justify-content: flex-start; padding-top: 4px; }
   .pinline-name-col h2 { font-size: clamp(22px, 6vw, 30px); }
