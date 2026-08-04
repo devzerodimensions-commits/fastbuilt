@@ -6,6 +6,7 @@ import Project from './pages/Project'
 import Team from './pages/Team'
 import Workers from './pages/Workers'
 import PageTransition from './components/PageTransition'
+import IntroLoader from './components/IntroLoader'
 
 export default function App() {
   const { pathname } = useLocation()
@@ -13,6 +14,7 @@ export default function App() {
 
   return (
     <>
+      <IntroLoader />
       <PageTransition />
       <Header />
       <Routes>

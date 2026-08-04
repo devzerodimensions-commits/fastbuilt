@@ -177,10 +177,10 @@ img { display: block; max-width: 100%; }
 }
 .prow {
   display: grid;
-  grid-template-columns: 1fr minmax(300px, 560px) 1fr;  /* image column is dead-centre */
-  gap: clamp(24px, 4vw, 56px);
+  grid-template-columns: 1fr minmax(220px, 400px) 1fr;  /* smaller, big.dk-like; image dead-centre */
+  gap: clamp(20px, 3vw, 44px);
   align-items: start;
-  padding: 44px 0;
+  padding: 30px 0;
 }
 .pmeta { grid-column: 1; justify-self: end; text-align: right; max-width: 320px; padding-top: 4px; }
 .pimg { grid-column: 2; }
@@ -221,18 +221,18 @@ img { display: block; max-width: 100%; }
    starts with the NAME. Base height is always 60vh (so info always shows);
    the "grow" is a smooth scale so it can never collapse to 0. */
 .pitem.open {
-  height: 60vh;
+  height: 56vh;                 /* reserved immediately -> content never collapses, centering always correct */
   overflow: hidden;
-  margin: 12px 0 20px;
+  margin: 14px 0 22px;
 }
 .pitem.open .prow { display: none; }   /* hide compact row when open */
 .pitem.open .pinline {
-  transform-origin: center center;      /* grows from the centre outward */
-  animation: growIn .6s cubic-bezier(.22,.61,.36,1);
+  transform-origin: center top;
+  animation: growOpen .8s cubic-bezier(.22,.61,.36,1);   /* clear, smooth grow — no opacity blink */
 }
-@keyframes growIn {
-  from { transform: scale(.82); opacity: .3; }
-  to   { transform: scale(1); opacity: 1; }
+@keyframes growOpen {
+  from { transform: scale(.6); }
+  to   { transform: scale(1); }
 }
 
 /* OPEN: horizontal strip starting at the heading; image sits in page centre */
@@ -500,6 +500,32 @@ img { display: block; max-width: 100%; }
   background: #111; color: #fff;
 }
 @media (pointer: coarse) { .cursor { display: none; } }
+
+/* ===================== INTRO LOADER (big.dk-style) ===================== */
+.intro { position: fixed; inset: 0; z-index: 1000; pointer-events: none; }
+.intro-bg {
+  position: absolute; inset: 0; background: #111;
+  transform: translateY(0);
+  transition: transform .85s cubic-bezier(.76,0,.24,1);
+}
+.intro-bg.move { transform: translateY(-100%); }     /* black screen wipes up */
+.intro-logo {
+  position: fixed; top: 0; left: 0;
+  width: clamp(200px, 40vw, 360px);
+  z-index: 1001;
+  transform-origin: top left;
+  filter: invert(1);                                   /* white on the black screen */
+  opacity: 0;
+  animation: introLogoIn .55s ease forwards;
+  transition: transform .9s cubic-bezier(.76,0,.24,1), filter .5s ease .25s;
+  will-change: transform;
+}
+@keyframes introLogoIn { to { opacity: 1; } }
+.intro-logo.move { filter: invert(0); }               /* settles as the dark navbar logo */
+
+@media (prefers-reduced-motion: reduce) {
+  .intro { display: none; }
+}
 
 /* ===================== PAGE TRANSITION (wipe) ===================== */
 .page-wipe {

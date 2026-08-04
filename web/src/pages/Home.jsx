@@ -45,7 +45,8 @@ export default function Home() {
       for (let n = el; n; n = n.offsetParent) absTop += n.offsetTop
       const headerH = 62
       const vh = window.innerHeight
-      const targetY = absTop - headerH - Math.max(0, (vh - headerH - el.offsetHeight) / 2)
+      const finalH = vh * 0.56   // matches .pitem.open final height (grow animation)
+      const targetY = absTop - headerH - Math.max(0, (vh - headerH - finalH) / 2)
       if (window.__lenis) window.__lenis.scrollTo(Math.max(0, targetY), { duration: 1 })
       else window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' })
     }, 80)

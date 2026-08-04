@@ -64,12 +64,13 @@ export default function InlineProject({ project: p, onClose }) {
       imgPanel.style.marginLeft = m + 'px'
       el.scrollLeft = 0
     }
-    const t = setTimeout(center, 130)
+    const t = setTimeout(center, 140)   // height is reserved immediately, so image size is stable
+    const t2 = setTimeout(center, 500)  // safety recompute
     window.addEventListener('resize', center)
     const img = el.querySelector('.ph-image img')
     if (img && !img.complete) img.addEventListener('load', center)
     return () => {
-      clearTimeout(t)
+      clearTimeout(t); clearTimeout(t2)
       window.removeEventListener('resize', center)
       if (img) img.removeEventListener('load', center)
     }
