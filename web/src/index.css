@@ -235,24 +235,22 @@ img { display: block; max-width: 100%; }
   to   { height: var(--open-h); }
 }
 .pitem.open .prow { display: none; }   /* hide compact row when open */
-/* keep the open image steady & GPU-composited so it never flickers/disappears */
-.ph-image img { backface-visibility: hidden; transform: translateZ(0); }
 
-/* OPEN: [ fixed name column ][ horizontal-scroll strip: image + details ] */
-.pinline { height: 100%; display: flex; flex-direction: row; align-items: stretch; gap: clamp(20px, 2.5vw, 44px); }
-/* fixed name column — stays put while the strip scrolls */
+/* OPEN: name overlays on the left (fixed); image is flex-centred so it grows in place */
+.pinline { position: relative; height: 100%; }
 .pinline-name-col {
-  flex: 0 0 clamp(170px, 20vw, 300px);
-  display: flex; flex-direction: column; justify-content: center;
-  cursor: pointer;
+  position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  z-index: 3; cursor: pointer;
+  width: clamp(150px, 20vw, 280px);
+  padding: 10px 26px 10px 0;
+  background: linear-gradient(90deg, #fff 60%, rgba(255,255,255,0));
 }
 .pinline-name-col .picon { width: 40px; height: 40px; margin: 0 0 16px; }
 .pinline-name-col h2 { font-size: clamp(24px, 3vw, 44px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.05; margin: 0 0 10px; }
 .pinline-name-col .ph-loc { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
 
 .pinline-scroll {
-  flex: 1 1 auto; min-width: 0;
-  height: 100%;
+  width: 100%; height: 100%;
   display: flex;
   align-items: stretch;
   gap: clamp(24px, 3vw, 56px);
@@ -265,15 +263,18 @@ img { display: block; max-width: 100%; }
 .pinline-scroll::-webkit-scrollbar { display: none; height: 0; }
 .pinline-scroll.dragging { cursor: grabbing; }
 .ph-panel { height: 100%; flex: 0 0 auto; display: flex; flex-direction: column; justify-content: center; }
-.ph-image { }
+/* hero slide = full strip width, image centred on the page (stays centred as it grows) */
+.ph-hero { flex: 0 0 100%; flex-direction: row; align-items: center; justify-content: center; }
+.ph-hero img { height: 100%; width: auto; max-width: 100%; backface-visibility: hidden; }
 
 /* Phone: name goes ON TOP (not left), image + details scroll horizontally below */
 @media (max-width: 720px) {
   .pitem.open { --open-h: 66vh; }
-  .pinline { flex-direction: column; gap: 12px; }
-  .pinline-name-col { flex: 0 0 auto; width: 100%; justify-content: flex-start; padding-top: 4px; }
+  .pinline { display: flex; flex-direction: column; gap: 10px; }
+  .pinline-name-col { position: static; transform: none; width: 100%; background: none; padding: 4px 0 0; }
   .pinline-name-col h2 { font-size: clamp(22px, 6vw, 30px); }
   .pinline-scroll { flex: 1 1 auto; min-height: 0; width: 100%; }
+  .ph-hero { flex: 0 0 auto; }   /* image its own width on phone (drag to view) */
 }
 .ph-image img { height: 100%; width: auto; max-width: none; object-fit: cover; user-select: none; -webkit-user-drag: none; }
 .ph-intro { width: min(72vw, 460px); }

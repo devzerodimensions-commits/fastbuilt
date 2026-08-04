@@ -11,13 +11,12 @@ const SPEC_FIELDS = [
   ['Team', 'team'],
 ]
 
-// Name/heading stays FIXED on the left; the image + details scroll horizontally
-// (left-click drag). The big image sits in the page centre.
+// Name/heading fixed on the left; the image is CSS-centred (flex) so it grows in
+// place at the centre — no left-shift/drift. Drag to scroll the info sideways.
 export default function InlineProject({ project: p, onClose }) {
   const ref = useRef(null)
   const movedRef = useRef(false)
 
-  // drag-to-scroll the strip (left button) — name column stays put
   useEffect(() => {
     const el = ref.current
     if (!el) return
@@ -45,51 +44,20 @@ export default function InlineProject({ project: p, onClose }) {
     }
   }, [])
 
-  // centre the first image on the page — computed ONCE (no per-frame reflow, so the grow stays buttery smooth)
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const center = () => {
-      const imgPanel = el.querySelector('.ph-image')
-      if (!imgPanel) return
-      const img = imgPanel.querySelector('img')
-      let stripLeft = 0
-      for (let n = el; n; n = n.offsetParent) stripLeft += n.offsetLeft
-      // use the FINAL image width (natural aspect × final open height) so we don't
-      // have to wait for / track the grow animation
-      let finalW = imgPanel.offsetWidth
-      if (img && img.naturalWidth) {
-        finalW = (window.innerHeight * 0.56) * (img.naturalWidth / img.naturalHeight)
-      }
-      imgPanel.style.marginLeft = Math.max(0, window.innerWidth / 2 - finalW / 2 - stripLeft) + 'px'
-      el.scrollLeft = 0
-    }
-    const img = el.querySelector('.ph-image img')
-    if (img && img.complete) center()
-    else if (img) img.addEventListener('load', center)
-    const t = setTimeout(center, 50)   // safety
-    window.addEventListener('resize', center)
-    return () => {
-      clearTimeout(t)
-      window.removeEventListener('resize', center)
-      if (img) img.removeEventListener('load', center)
-    }
-  }, [])
-
   const guard = (e) => { if (movedRef.current) { e.preventDefault(); e.stopPropagation() } }
 
   return (
     <div className="pinline">
-      {/* FIXED name column (does not scroll) */}
+      {/* fixed name column (absolute on desktop, on top on mobile) */}
       <div className="pinline-name-col" onClick={() => onClose && onClose()} title="Click to close">
         <CategoryIcon category={p.category} />
         <h2>{p.name}</h2>
         <span className="ph-loc">{p.location}</span>
       </div>
 
-      {/* horizontal scroll strip: image + details */}
       <div className="pinline-scroll" ref={ref} onClickCapture={guard}>
-        <section className="ph-panel ph-image">
+        {/* hero slide = full width, image centred on the page */}
+        <section className="ph-panel ph-hero">
           <img src={imgColor(p.image)} alt={p.name} draggable="false" />
         </section>
         <section className="ph-panel ph-intro">
@@ -106,7 +74,7 @@ export default function InlineProject({ project: p, onClose }) {
             ))}
           </div>
         </section>
-        <section className="ph-panel ph-image">
+        <section className="ph-panel ph-hero">
           <img src={imgColor(p.image2 || p.image)} alt={p.name} draggable="false" />
         </section>
       </div>
