@@ -35,10 +35,10 @@ export default function IntroLoader() {
       }
     }, 1000)
 
-    // (2) once the logo is seated at top-left, lift the black curtain to reveal the site
-    const t2 = setTimeout(() => setLift(true), 2250)
+    // (2) AS the logo is reaching the navbar (no pause), start lifting the black curtain
+    const t2 = setTimeout(() => setLift(true), 1950)
 
-    const t3 = setTimeout(() => { document.body.style.overflow = ''; setShow(false) }, 3450)
+    const t3 = setTimeout(() => { document.body.style.overflow = ''; setShow(false) }, 3250)
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); document.body.style.overflow = '' }
   }, [])
 
