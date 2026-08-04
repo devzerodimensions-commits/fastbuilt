@@ -1,0 +1,19 @@
+# Render Blueprint — Fastbuilt (static site)
+# The frontend is fully self-contained (bundled sample data), so no backend/DB
+# is needed just to host & share the site.
+services:
+  - name: fastbuilt
+    type: web
+    runtime: static
+    rootDir: web
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    pullRequestPreviewsEnabled: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN

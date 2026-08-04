@@ -1,0 +1,31 @@
+# dependencies
+node_modules/
+web/node_modules/
+server/node_modules/
+
+# builds
+web/dist/
+dist/
+
+# local database (portable PG data — never commit)
+database/data/
+database/*.log
+database/log.txt
+database/pwfile.txt
+
+# env
+server/.env
+*.env.local
+
+# source/originals not needed for deploy
+Combined.pdf
+assets_color/
+assets_bw/
+geist-font/
+_*/
+*.tmp
+
+# os
+Thumbs.db
+desktop.ini
+.DS_Store
