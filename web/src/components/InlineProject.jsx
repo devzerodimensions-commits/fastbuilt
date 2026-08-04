@@ -58,7 +58,7 @@ export default function InlineProject({ project: p, onClose }) {
       <div className="pinline-scroll" ref={ref} onClickCapture={guard}>
         {/* hero slide = full width, image centred on the page */}
         <section className="ph-panel ph-hero">
-          <img src={imgColor(p.image)} alt={p.name} draggable="false" />
+          <img src={imgColor(p.image)} alt={p.name} draggable="false" decoding="async" />
         </section>
         <section className="ph-panel ph-intro">
           <span className="pinline-cat">Overview</span>
@@ -75,7 +75,7 @@ export default function InlineProject({ project: p, onClose }) {
           </div>
         </section>
         <section className="ph-panel ph-hero">
-          <img src={imgColor(p.image2 || p.image)} alt={p.name} draggable="false" />
+          <img src={imgColor(p.image2 || p.image)} alt={p.name} draggable="false" decoding="async" />
         </section>
       </div>
     </div>

@@ -19,10 +19,11 @@ export default function Home() {
     fetchProjects().then((p) => {
       setProjects(p)
       setLoading(false)
-      // preload the full-colour images so opening a project never flashes/blank
+      // preload + decode the full-colour images so opening never pauses/flashes
+      const warm = (src) => { const im = new Image(); im.src = src; im.decode && im.decode().catch(() => {}) }
       p.forEach((pr) => {
-        const im = new Image(); im.src = imgColor(pr.image)
-        if (pr.image2) { const im2 = new Image(); im2.src = imgColor(pr.image2) }
+        warm(imgColor(pr.image))
+        if (pr.image2) warm(imgColor(pr.image2))
       })
     })
   }, [])
