@@ -4,7 +4,7 @@ import Footer from '../components/Footer'
 import CategoryIcon from '../components/CategoryIcon'
 import InlineProject from '../components/InlineProject'
 import useHomeMotion from '../lib/useHomeMotion'
-import { fetchProjects, imgBW, imgColor, imgLQIP } from '../lib/projects'
+import { fetchProjects, imgColor, imgLQIP } from '../lib/projects'
 
 export default function Home() {
   const [projects, setProjects] = useState([])
@@ -97,7 +97,8 @@ export default function Home() {
                   </div>
                   <div className="pimg">
                     <span className="lqip" style={{ backgroundImage: `url(${imgLQIP(p.image)})` }} aria-hidden="true" />
-                    <img src={imgBW(p.image)} alt={p.name} loading="lazy"
+                    {/* same COLOUR file as the open view (shown B&W via CSS) so opening reuses it — no reload/pause */}
+                    <img src={imgColor(p.image)} alt={p.name}
                       onLoad={(e) => e.currentTarget.classList.add('loaded')} />
                   </div>
                 </div>
