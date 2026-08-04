@@ -239,9 +239,20 @@ img { display: block; max-width: 100%; }
 /* keep the open image steady & GPU-composited so it never flickers/disappears */
 .ph-image img { backface-visibility: hidden; transform: translateZ(0); }
 
-/* OPEN: horizontal strip starting at the heading; image sits in page centre */
-.pinline { height: 100%; }
+/* OPEN: [ fixed name column ][ horizontal-scroll strip: image + details ] */
+.pinline { height: 100%; display: flex; flex-direction: row; align-items: stretch; gap: clamp(20px, 2.5vw, 44px); }
+/* fixed name column — stays put while the strip scrolls */
+.pinline-name-col {
+  flex: 0 0 clamp(170px, 20vw, 300px);
+  display: flex; flex-direction: column; justify-content: center;
+  cursor: pointer;
+}
+.pinline-name-col .picon { width: 40px; height: 40px; margin: 0 0 16px; }
+.pinline-name-col h2 { font-size: clamp(24px, 3vw, 44px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.05; margin: 0 0 10px; }
+.pinline-name-col .ph-loc { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+
 .pinline-scroll {
+  flex: 1 1 auto; min-width: 0;
   height: 100%;
   display: flex;
   align-items: stretch;
@@ -255,11 +266,6 @@ img { display: block; max-width: 100%; }
 .pinline-scroll::-webkit-scrollbar { display: none; height: 0; }
 .pinline-scroll.dragging { cursor: grabbing; }
 .ph-panel { height: 100%; flex: 0 0 auto; display: flex; flex-direction: column; justify-content: center; }
-/* heading (name) — first panel */
-.ph-name { width: clamp(180px, 20vw, 300px); cursor: pointer; }
-.ph-name .picon { width: 40px; height: 40px; margin: 0 0 16px; }
-.ph-name h2 { font-size: clamp(24px, 3vw, 44px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.05; margin: 0 0 10px; }
-.ph-name .ph-loc { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
 .ph-image { }
 .ph-image img { height: 100%; width: auto; max-width: none; object-fit: cover; user-select: none; -webkit-user-drag: none; }
 .ph-intro { width: min(72vw, 460px); }

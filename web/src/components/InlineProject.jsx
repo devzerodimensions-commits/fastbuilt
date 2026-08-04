@@ -11,14 +11,13 @@ const SPEC_FIELDS = [
   ['Team', 'team'],
 ]
 
-// Horizontal strip that starts at the HEADING (name). The big image sits in
-// the page centre. Left-click + drag moves everything sideways, starting from
-// the heading.
+// Name/heading stays FIXED on the left; the image + details scroll horizontally
+// (left-click drag). The big image sits in the page centre.
 export default function InlineProject({ project: p, onClose }) {
   const ref = useRef(null)
   const movedRef = useRef(false)
 
-  // drag-to-scroll (left button)
+  // drag-to-scroll the strip (left button) — name column stays put
   useEffect(() => {
     const el = ref.current
     if (!el) return
@@ -46,26 +45,23 @@ export default function InlineProject({ project: p, onClose }) {
     }
   }, [])
 
-  // put the big image in the page centre (heading stays to its left)
+  // centre the first image on the page (name column stays to its left)
   useEffect(() => {
     const el = ref.current
     if (!el) return
     const center = () => {
-      const nameEl = el.querySelector('.ph-name')
       const imgPanel = el.querySelector('.ph-image')
-      if (!nameEl || !imgPanel) return
+      if (!imgPanel) return
       imgPanel.style.marginLeft = '0px'
       let stripLeft = 0
       for (let n = el; n; n = n.offsetParent) stripLeft += n.offsetLeft
-      const gap = parseFloat(getComputedStyle(el).columnGap) || 0
-      const imgStartNoMargin = stripLeft + nameEl.offsetWidth + gap
       const desiredImgLeft = window.innerWidth / 2 - imgPanel.offsetWidth / 2
-      const m = Math.max(0, desiredImgLeft - imgStartNoMargin)
+      const m = Math.max(0, desiredImgLeft - stripLeft)
       imgPanel.style.marginLeft = m + 'px'
       el.scrollLeft = 0
     }
-    const t = setTimeout(center, 140)   // height is reserved immediately, so image size is stable
-    const t2 = setTimeout(center, 500)  // safety recompute
+    const t = setTimeout(center, 140)
+    const t2 = setTimeout(center, 500)
     window.addEventListener('resize', center)
     const img = el.querySelector('.ph-image img')
     if (img && !img.complete) img.addEventListener('load', center)
@@ -80,26 +76,22 @@ export default function InlineProject({ project: p, onClose }) {
 
   return (
     <div className="pinline">
-      <div className="pinline-scroll" ref={ref} onClickCapture={guard}>
-        <section
-          className="ph-panel ph-name"
-          onClick={() => !movedRef.current && onClose && onClose()}
-          title="Click to close"
-        >
-          <CategoryIcon category={p.category} />
-          <h2>{p.name}</h2>
-          <span className="ph-loc">{p.location}</span>
-        </section>
+      {/* FIXED name column (does not scroll) */}
+      <div className="pinline-name-col" onClick={() => onClose && onClose()} title="Click to close">
+        <CategoryIcon category={p.category} />
+        <h2>{p.name}</h2>
+        <span className="ph-loc">{p.location}</span>
+      </div>
 
+      {/* horizontal scroll strip: image + details */}
+      <div className="pinline-scroll" ref={ref} onClickCapture={guard}>
         <section className="ph-panel ph-image">
           <img src={imgColor(p.image)} alt={p.name} draggable="false" />
         </section>
-
         <section className="ph-panel ph-intro">
           <span className="pinline-cat">Overview</span>
           <p>{p.summary}</p>
         </section>
-
         <section className="ph-panel ph-specs">
           <div className="pinline-specs">
             {SPEC_FIELDS.map(([label, key]) => (
@@ -110,7 +102,6 @@ export default function InlineProject({ project: p, onClose }) {
             ))}
           </div>
         </section>
-
         <section className="ph-panel ph-image">
           <img src={imgColor(p.image2 || p.image)} alt={p.name} draggable="false" />
         </section>
