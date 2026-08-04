@@ -211,7 +211,7 @@ img { display: block; max-width: 100%; }
   will-change: transform;
 }
 .pimg img.loaded { opacity: 1; }
-.prow:hover .pimg img { filter: grayscale(0%); }  /* colour on hover */
+/* thumbnails stay B&W in the list; colour appears only when a project is opened */
 
 /* ---- clickable row + inline expand ---- */
 .prow { cursor: pointer; }
