@@ -21,7 +21,7 @@ export default function IntroLoader() {
     document.body.style.overflow = 'hidden'
     const el = logoRef.current
 
-    // after a beat: enable the transition and fly the logo into the navbar + wipe bg up
+    // 1) fly the logo into the navbar (black screen still full)
     const t1 = setTimeout(() => {
       if (el) {
         el.style.transition = 'transform 1.3s cubic-bezier(.76,0,.24,1), filter .8s ease'
@@ -34,12 +34,16 @@ export default function IntroLoader() {
       setPhase('move')
     }, 1700)
 
-    const t2 = setTimeout(() => {
+    // 2) AFTER the logo has settled on the left, wipe the black screen up
+    const t2 = setTimeout(() => setPhase('wipe'), 3100)
+
+    // 3) remove once the wipe is done
+    const t3 = setTimeout(() => {
       document.body.style.overflow = ''
       setShow(false)
-    }, 3100)
+    }, 4400)
 
-    return () => { clearTimeout(t1); clearTimeout(t2); document.body.style.overflow = '' }
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); document.body.style.overflow = '' }
   }, [])
 
   if (!show) return null
