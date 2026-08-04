@@ -26,7 +26,7 @@ export default function IntroLoader() {
     // hold, then TOGETHER: fly the logo up-left into the navbar + lift the black curtain up
     const t1 = setTimeout(() => {
       if (el) {
-        el.style.transition = 'transform 1.15s cubic-bezier(.76, 0, .24, 1), filter .8s ease'
+        el.style.transition = 'transform 1s cubic-bezier(.76, 0, .24, 1), filter .8s ease'
         const target = document.querySelector('.brand-logo')?.getBoundingClientRect()
         if (target && el.offsetHeight) {
           const s = target.height / el.offsetHeight
@@ -36,7 +36,7 @@ export default function IntroLoader() {
       setLift(true)                                   // black starts moving up at the SAME moment
     }, 1000)
 
-    const t2 = setTimeout(() => { document.body.style.overflow = ''; setShow(false) }, 2400)
+    const t2 = setTimeout(() => { document.body.style.overflow = ''; setShow(false) }, 2900)
     return () => { clearTimeout(t1); clearTimeout(t2); document.body.style.overflow = '' }
   }, [])
 
