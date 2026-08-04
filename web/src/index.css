@@ -229,21 +229,20 @@ img { display: block; max-width: 100%; }
 .pitem.open .prow { display: none; }   /* hide compact row when open */
 .pitem.open .ph-hero img { will-change: transform, filter; }
 
-/* OPEN: name overlays on the left (fixed); image is flex-centred so it grows in place */
-.pinline { position: relative; height: 100%; }
+/* OPEN: name = fixed left column; strip (image + details) scrolls to its right,
+   clipped to its own box so the image never slides behind the heading */
+.pinline { height: 100%; display: flex; flex-direction: row; align-items: stretch; gap: clamp(20px, 2.5vw, 44px); }
 .pinline-name-col {
-  position: absolute; left: 0; top: 50%; transform: translateY(-50%);
-  z-index: 3; cursor: pointer;
-  width: clamp(150px, 20vw, 280px);
-  padding: 10px 26px 10px 0;
-  background: linear-gradient(90deg, #fff 60%, rgba(255,255,255,0));
+  flex: 0 0 clamp(160px, 20vw, 280px);
+  display: flex; flex-direction: column; justify-content: center;
+  cursor: pointer;
 }
 .pinline-name-col .picon { width: 40px; height: 40px; margin: 0 0 16px; }
 .pinline-name-col h2 { font-size: clamp(24px, 3vw, 44px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.05; margin: 0 0 10px; }
 .pinline-name-col .ph-loc { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
 
 .pinline-scroll {
-  width: 100%; height: 100%;
+  flex: 1 1 auto; min-width: 0; height: 100%;
   display: flex;
   align-items: stretch;
   gap: clamp(24px, 3vw, 56px);
