@@ -49,6 +49,25 @@ export default function Home() {
     toggle(slug)
   }
 
+  // centre the opened project vertically in the viewport (works with the FLIP,
+  // since scrolling moves everything uniformly)
+  useEffect(() => {
+    if (!openSlug) return
+    const t = setTimeout(() => {
+      const el = document.querySelector('.pitem.open')
+      if (!el) return
+      let absTop = 0
+      for (let n = el; n; n = n.offsetParent) absTop += n.offsetTop
+      const headerH = 62
+      const vh = window.innerHeight
+      const finalH = vh * 0.56
+      const targetY = Math.max(0, absTop - headerH - Math.max(0, (vh - headerH - finalH) / 2))
+      if (window.__lenis) window.__lenis.scrollTo(targetY, { duration: 0.9 })
+      else window.scrollTo({ top: targetY, behavior: 'smooth' })
+    }, 30)
+    return () => clearTimeout(t)
+  }, [openSlug])
+
   return (
     <>
       {loading ? (
