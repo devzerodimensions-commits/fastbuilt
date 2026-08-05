@@ -255,9 +255,12 @@ img { display: block; max-width: 100%; }
 .pinline-scroll::-webkit-scrollbar { display: none; height: 0; }
 .pinline-scroll.dragging { cursor: grabbing; }
 .ph-panel { height: 100%; flex: 0 0 auto; display: flex; flex-direction: column; justify-content: center; }
-/* hero slide = image's own width; first image is page-centred via JS (margin-left) */
 .ph-hero { flex: 0 0 auto; flex-direction: row; align-items: center; justify-content: flex-start; }
 .ph-hero img { height: 100%; width: auto; max-width: none; backface-visibility: hidden; }
+/* FIRST hero = fills the viewing area and shows the WHOLE image, centred both ways
+   (transform-proof: pure flex centring, no JS margins — always centred on every device) */
+.pinline-scroll > .ph-hero:first-child { flex: 0 0 100%; min-width: 100%; max-width: 100%; justify-content: center; }
+.pinline-scroll > .ph-hero:first-child img { height: auto; width: auto; max-width: 100%; max-height: 100%; }
 
 /* Phone: name goes ON TOP (not left), image + details scroll horizontally below */
 @media (max-width: 720px) {

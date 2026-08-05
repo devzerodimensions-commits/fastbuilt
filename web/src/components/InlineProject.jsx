@@ -19,19 +19,14 @@ export default function InlineProject({ project: p, flipFrom, onClose }) {
 
   // FLIP: morph the SAME image from the clicked thumbnail's rect -> its open rect
   // (grows in place, no swap/pause) and colourise B&W -> colour during the move.
-  // page-centre the first image (once) — keep it as a ref so resize can reuse it
+  // The first hero panel is full-width (CSS: min-width:100%) and centres the whole
+  // image within the viewing area (CSS: justify-content:center + max-width/height).
+  // So centring needs no fragile JS math — just make sure we start un-scrolled.
   const centreImage = () => {
     const el = ref.current
     if (!el) return
     const heroPanel = el.querySelector('.ph-hero')
-    const img = heroPanel && heroPanel.querySelector('img')
-    if (!heroPanel || !img) return
-    heroPanel.style.marginLeft = '0px'
-    let stripLeft = 0
-    for (let n = el; n; n = n.offsetParent) stripLeft += n.offsetLeft
-    const imgW = img.getBoundingClientRect().width ||
-      (window.innerHeight * 0.56) * (img.naturalWidth / img.naturalHeight || 1.4)
-    heroPanel.style.marginLeft = Math.max(0, window.innerWidth / 2 - imgW / 2 - stripLeft) + 'px'
+    if (heroPanel) heroPanel.style.marginLeft = ''   // clear any stale inline margin
     el.scrollLeft = 0
   }
 
@@ -62,7 +57,14 @@ export default function InlineProject({ project: p, flipFrom, onClose }) {
       { duration: 1500, easing: 'cubic-bezier(.22,.61,.36,1)', fill: 'both' }
     )
     window.addEventListener('resize', centreImage)
-    return () => { try { anim.cancel() } catch {}; window.removeEventListener('resize', centreImage) }
+    // if the image wasn't decoded yet (offsetWidth 0), re-centre once it loads
+    const onImgLoad = () => centreImage()
+    if (!img.complete || !img.naturalWidth) img.addEventListener('load', onImgLoad)
+    return () => {
+      try { anim.cancel() } catch {}
+      window.removeEventListener('resize', centreImage)
+      img.removeEventListener('load', onImgLoad)
+    }
   }, [flipFrom])
 
   useEffect(() => {
