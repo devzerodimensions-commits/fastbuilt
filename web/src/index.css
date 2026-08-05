@@ -177,7 +177,7 @@ img { display: block; max-width: 100%; }
 }
 .prow {
   display: grid;
-  grid-template-columns: 1fr 313px 1fr;  /* fixed 313px thumbnail, dead-centre */
+  grid-template-columns: 1fr minmax(220px, 400px) 1fr;  /* smaller, big.dk-like; image dead-centre */
   gap: clamp(20px, 3vw, 44px);
   align-items: start;
   padding: 30px 0;
@@ -193,7 +193,12 @@ img { display: block; max-width: 100%; }
   font-size: 11.5px; color: var(--muted);
   text-transform: uppercase; letter-spacing: .07em; margin-top: 7px;
 }
-.pimg { position: relative; width: 313px; max-width: 100%; aspect-ratio: 313 / 170; overflow: hidden; background: #eee; }
+.pimg { position: relative; width: 100%; aspect-ratio: 16 / 10; overflow: hidden; background: #eee; }
+/* LAPTOP ONLY: fixed 313x170 thumbnails (phone/tablet/large-desktop keep the original size) */
+@media (min-width: 1024px) and (max-width: 1440px) {
+  .prow { grid-template-columns: 1fr 313px 1fr; }
+  .pimg { width: 313px; max-width: 100%; aspect-ratio: 313 / 170; }
+}
 /* blur-up placeholder (LQIP) shows first, real image fades in over it */
 .lqip {
   position: absolute; inset: 0; z-index: 0;
