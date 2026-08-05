@@ -210,25 +210,42 @@ img { display: block; max-width: 100%; }
 .wsection > .home-shead { padding: 0; }          /* section already provides the side padding */
 .wsection + .home-shead { margin-top: 48px; }    /* separate the "Projects" heading from workers */
 
-.wgrid {
+/* column & row photo grid: B&W by default, colour + name/role overlay on hover */
+.whome-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 22px clamp(24px, 4vw, 60px);
+  grid-template-columns: repeat(3, minmax(0, 210px));
+  gap: 0;
+  justify-content: center;
 }
-.witem { display: flex; align-items: center; gap: 14px; padding: 8px 0; }
-.wicon { flex: 0 0 auto; width: 40px; height: 40px; }   /* black-square icon */
-.wicon svg { width: 100%; height: 100%; display: block; }
-.wtext { min-width: 0; }
-.wname { font-size: 16px; font-weight: 600; line-height: 1.25; color: #111; }
-.wrole { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-top: 4px; }
+.whome-card { margin: 0; position: relative; overflow: hidden; border-radius: 3px; }
+.whome-img { aspect-ratio: 4 / 5; overflow: hidden; background: #eee; }
+.whome-img img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  filter: grayscale(100%);                                          /* B&W by default */
+  transition: filter .5s ease, transform .5s cubic-bezier(.2,.8,.2,1);
+}
+.whome-card:hover .whome-img img { filter: grayscale(0%); transform: scale(1.05); }  /* colour on hover */
+.whome-cap {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 30px 14px 12px;
+  color: #fff;
+  background: linear-gradient(to top, rgba(0,0,0,.8), rgba(0,0,0,0));
+  transform: translateY(14px); opacity: 0;
+  transition: transform .4s ease, opacity .4s ease;
+  pointer-events: none;
+}
+.whome-card:hover .whome-cap { transform: translateY(0); opacity: 1; }
+.whome-name { font-size: 15px; font-weight: 600; color: #fff; letter-spacing: -0.01em; }
+.whome-role { font-size: 11px; color: #cfcfcf; text-transform: uppercase; letter-spacing: .07em; margin-top: 3px; }
 
 @media (max-width: 760px) {
   .wsection { padding-top: calc(62px + 24px); }
   .wsection + .home-shead { margin-top: 34px; }
-  .wgrid { grid-template-columns: repeat(2, 1fr); gap: 18px 30px; }
+  .whome-grid { grid-template-columns: repeat(2, minmax(0, 200px)); }
 }
 @media (max-width: 460px) {
-  .wgrid { grid-template-columns: 1fr; }
+  .whome-grid { grid-template-columns: repeat(2, 1fr); }
 }
 /* blur-up placeholder (LQIP) shows first, real image fades in over it */
 .lqip {

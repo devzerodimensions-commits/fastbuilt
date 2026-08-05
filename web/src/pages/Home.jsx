@@ -5,7 +5,7 @@ import CategoryIcon from '../components/CategoryIcon'
 import InlineProject from '../components/InlineProject'
 import useHomeMotion from '../lib/useHomeMotion'
 import { fetchProjects, imgColor, imgLQIP } from '../lib/projects'
-import { WORKERS } from '../lib/workers'
+import { WORKERS, imgWorker } from '../lib/workers'
 
 export default function Home() {
   const [projects, setProjects] = useState([])
@@ -75,24 +75,20 @@ export default function Home() {
         <div className="loading">Loading projects…</div>
       ) : (
         <div className="page-scale" ref={scaleRef}>
-        {/* WORKERS — one section, column & row grid: black-square icon + heading (name) */}
+        {/* WORKERS — column & row photo grid: B&W, colour + name/role on hover */}
         <section className="wsection">
           <h2 className="home-shead">Our Workforce</h2>
-          <div className="wgrid">
+          <div className="whome-grid">
             {WORKERS.map((w) => (
-              <div className="witem" key={w.img}>
-                <span className="wicon">
-                  <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="40" height="40" fill="#111" />
-                    <circle cx="20" cy="16" r="4.6" stroke="#fff" strokeWidth="1.8" />
-                    <path d="M11 30c0-5 4-8.5 9-8.5s9 3.5 9 8.5" stroke="#fff" strokeWidth="1.8" />
-                  </svg>
-                </span>
-                <div className="wtext">
-                  <div className="wname">{w.name}</div>
-                  <div className="wrole">{w.role}</div>
+              <figure className="whome-card" key={w.img}>
+                <div className="whome-img">
+                  <img src={imgWorker(w.img)} alt={w.name} loading="lazy" />
                 </div>
-              </div>
+                <figcaption className="whome-cap">
+                  <span className="whome-name">{w.name}</span>
+                  <span className="whome-role">{w.role}</span>
+                </figcaption>
+              </figure>
             ))}
           </div>
         </section>
