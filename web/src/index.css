@@ -211,14 +211,18 @@ img { display: block; max-width: 100%; }
 .wsection + .home-shead { margin-top: 48px; }    /* separate the "Projects" heading from workers */
 
 /* column & row photo grid: B&W by default, colour + name/role overlay on hover */
+/* the WHOLE grid (all 6 images together) = one project thumbnail's footprint, page-centred */
 .whome-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 400px));   /* match the project thumbnails (up to 400 wide) */
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
   gap: 0;
-  justify-content: center;
+  width: 400px; max-width: 100%;
+  aspect-ratio: 400 / 250;          /* same size as a project thumbnail */
+  margin: 0 auto;                   /* centre like the project image */
 }
-.whome-card { margin: 0; position: relative; overflow: hidden; border-radius: 3px; }
-.whome-img { aspect-ratio: 16 / 10; overflow: hidden; background: #eee; }   /* same aspect as project thumbnails */
+.whome-card { margin: 0; position: relative; overflow: hidden; }
+.whome-img { width: 100%; height: 100%; overflow: hidden; background: #eee; }   /* fills its small cell */
 .whome-img img {
   width: 100%; height: 100%; object-fit: cover; display: block;
   filter: grayscale(100%);                                          /* B&W by default */
@@ -239,18 +243,13 @@ img { display: block; max-width: 100%; }
 .whome-name { font-size: 15px; font-weight: 600; color: #fff; letter-spacing: -0.01em; }
 .whome-role { font-size: 11px; color: #cfcfcf; text-transform: uppercase; letter-spacing: .07em; margin-top: 3px; }
 
-/* LAPTOP: match the 313x170 project thumbnails */
+/* LAPTOP: whole grid = 313x170 (the laptop project thumbnail size) */
 @media (min-width: 1024px) and (max-width: 1440px) {
-  .whome-grid { grid-template-columns: repeat(3, minmax(0, 313px)); }
-  .whome-img { aspect-ratio: 313 / 170; }
+  .whome-grid { width: 313px; aspect-ratio: 313 / 170; }
 }
 @media (max-width: 760px) {
   .wsection { padding-top: calc(62px + 24px); }
   .wsection + .home-shead { margin-top: 34px; }
-  .whome-grid { grid-template-columns: repeat(2, minmax(0, 400px)); }
-}
-@media (max-width: 460px) {
-  .whome-grid { grid-template-columns: 1fr; }
 }
 /* blur-up placeholder (LQIP) shows first, real image fades in over it */
 .lqip {
