@@ -220,10 +220,11 @@ img { display: block; max-width: 100%; }
 .whome-card { margin: 0; }
 .whome-img { aspect-ratio: 4 / 5; overflow: hidden; background: #eee; border-radius: 3px; }
 .whome-img img {
-  width: 100%; height: 100%; object-fit: cover; display: block;   /* full colour */
-  transition: transform .5s cubic-bezier(.2,.8,.2,1);
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  filter: grayscale(100%);                                          /* B&W by default */
+  transition: filter .5s ease, transform .5s cubic-bezier(.2,.8,.2,1);
 }
-.whome-card:hover .whome-img img { transform: scale(1.05); }
+.whome-card:hover .whome-img img { filter: grayscale(0%); transform: scale(1.05); }  /* colour on hover */
 .whome-cap { display: flex; flex-direction: column; text-align: center; margin-top: 10px; }
 .whome-name { font-size: 15px; font-weight: 600; color: #111; letter-spacing: -0.01em; }
 .whome-role { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-top: 4px; }
