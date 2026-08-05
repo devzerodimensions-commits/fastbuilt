@@ -39,14 +39,16 @@ export default function InlineProject({ project: p, flipFrom, onClose }) {
     const pageCentre = col.clientWidth / 2                   // == screen centre
     // half-width available for a page-centred image (can't spill past the strip's edges)
     const maxHalf = Math.max(0, Math.min(pageCentre - scrollLeft, scrollLeft + el.clientWidth - pageCentre))
-    const aspect = (img.naturalWidth && img.naturalHeight) ? img.naturalWidth / img.naturalHeight : 1.4
-    const halfFromHeight = (el.clientHeight * aspect) / 2    // half-width at full strip height
-    const half = Math.max(0, Math.min(halfFromHeight, maxHalf))
-    // size the image (height follows via aspect) and page-centre it via the panel margin
-    img.style.width = (half * 2) + 'px'
-    img.style.height = 'auto'
+    // target size 800 x 480; scale DOWN proportionally on smaller screens so it always
+    // fits page-centred (object-fit: cover keeps the photo undistorted)
+    const BASE_W = 800, BASE_H = 480
+    const scale = Math.min(1, (maxHalf * 2) / BASE_W, el.clientHeight / BASE_H)
+    const w = BASE_W * scale, h = BASE_H * scale
+    img.style.width = w + 'px'
+    img.style.height = h + 'px'
+    img.style.objectFit = 'cover'
     const imgLeft = absLeft(img) - absLeft(col)              // image left within the column (margin still 0)
-    heroPanel.style.marginLeft = Math.max(0, pageCentre - half - imgLeft) + 'px'
+    heroPanel.style.marginLeft = Math.max(0, pageCentre - w / 2 - imgLeft) + 'px'
   }
 
   // FLIP: page-centre the image, then morph the SAME image from the thumbnail rect
