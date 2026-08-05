@@ -204,7 +204,7 @@ img { display: block; max-width: 100%; }
 /* One section, laid out column & row wise: each item = black-square icon + heading (name). */
 .home-shead {
   font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .12em;
-  color: var(--muted); text-align: left; padding: 0 var(--pad); margin: 0 0 22px;
+  color: var(--muted); text-align: center; padding: 0 var(--pad); margin: 0 0 22px;
 }
 .wsection { padding: calc(62px + 40px) var(--pad) 6px; }
 .wsection > .home-shead { padding: 0; }          /* section already provides the side padding */
