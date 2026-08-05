@@ -182,30 +182,45 @@ img { display: block; max-width: 100%; }
   font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .12em;
   color: var(--muted); text-align: center; margin: 0 0 26px;
 }
+/* whole container = one project image (400x250); 3x2 small images inside, no gap */
 .wh-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 240px));
-  gap: clamp(14px, 2vw, 26px);
-  justify-content: center;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 0;
+  width: 400px; max-width: 100%;
+  aspect-ratio: 16 / 10;               /* same size as a project thumbnail */
+  margin: 0 auto;                      /* centred like the project image */
 }
-.wh-card { margin: 0; }
-.wh-img { aspect-ratio: 4 / 5; overflow: hidden; background: #eee; border-radius: 3px; }
+.wh-card { margin: 0; position: relative; overflow: hidden; }
+.wh-img { width: 100%; height: 100%; overflow: hidden; background: #eee; }
 .wh-img img {
   width: 100%; height: 100%; object-fit: cover; display: block;
   filter: grayscale(100%);                                   /* B&W by default */
   transition: filter .5s ease, transform .6s cubic-bezier(.2,.8,.2,1);
 }
-.wh-card:hover .wh-img img { filter: grayscale(0%); transform: scale(1.04); }   /* colour on hover */
-.wh-cap { display: flex; flex-direction: column; text-align: center; margin-top: 10px; }
-.wh-name { font-size: 15px; font-weight: 600; color: #111; letter-spacing: -0.01em; }
-.wh-role { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-top: 4px; }
+.wh-card:hover .wh-img img { filter: grayscale(0%); transform: scale(1.05); }   /* colour on hover */
+/* name/role reveal over the small image on hover */
+.wh-cap {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  display: flex; flex-direction: column;
+  padding: 20px 8px 6px;
+  color: #fff;
+  background: linear-gradient(to top, rgba(0,0,0,.82), rgba(0,0,0,0));
+  transform: translateY(8px); opacity: 0;
+  transition: transform .35s ease, opacity .35s ease;
+  pointer-events: none;
+}
+.wh-card:hover .wh-cap { transform: translateY(0); opacity: 1; }
+.wh-name { font-size: 12px; font-weight: 600; color: #fff; line-height: 1.15; }
+.wh-role { font-size: 9px; color: #cfcfcf; text-transform: uppercase; letter-spacing: .06em; margin-top: 2px; }
 
+/* LAPTOP: whole container = 313x170 */
+@media (min-width: 1024px) and (max-width: 1440px) {
+  .wh-grid { width: 313px; aspect-ratio: 313 / 170; }
+}
 @media (max-width: 760px) {
   .workers-home { padding-top: calc(62px + 24px); }
-  .wh-grid { grid-template-columns: repeat(2, minmax(0, 220px)); }
-}
-@media (max-width: 460px) {
-  .wh-grid { grid-template-columns: repeat(2, 1fr); }
 }
 .prow {
   display: grid;
