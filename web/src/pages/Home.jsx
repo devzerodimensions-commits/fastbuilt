@@ -75,21 +75,33 @@ export default function Home() {
         <div className="loading">Loading projects…</div>
       ) : (
         <div className="page-scale" ref={scaleRef}>
-        {/* WORKERS — column & row photo grid: B&W, colour + name/role on hover */}
+        {/* WORKERS — project-row style: icon + heading left, worker grid (project-sized) centre */}
         <section className="wsection">
-          <h2 className="home-shead">Our Workforce</h2>
-          <div className="whome-grid">
-            {WORKERS.map((w) => (
-              <figure className="whome-card" key={w.img}>
-                <div className="whome-img">
-                  <img src={imgWorker(w.img)} alt={w.name} loading="lazy" />
-                </div>
-                <figcaption className="whome-cap">
-                  <span className="whome-name">{w.name}</span>
-                  <span className="whome-role">{w.role}</span>
-                </figcaption>
-              </figure>
-            ))}
+          <div className="wrow">
+            <div className="wmeta">
+              <span className="wicon">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="40" height="40" fill="#111" />
+                  <circle cx="20" cy="16" r="4.6" stroke="#fff" strokeWidth="1.8" />
+                  <path d="M11 30c0-5 4-8.5 9-8.5s9 3.5 9 8.5" stroke="#fff" strokeWidth="1.8" />
+                </svg>
+              </span>
+              <div className="wname">Our Workforce</div>
+              <div className="wrole">On-site Team</div>
+            </div>
+            <div className="whome-grid">
+              {WORKERS.map((w) => (
+                <figure className="whome-card" key={w.img}>
+                  <div className="whome-img">
+                    <img src={imgWorker(w.img)} alt={w.name} loading="lazy" />
+                  </div>
+                  <figcaption className="whome-cap">
+                    <span className="whome-name">{w.name}</span>
+                    <span className="whome-role">{w.role}</span>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
           </div>
         </section>
 
