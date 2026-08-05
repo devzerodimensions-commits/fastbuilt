@@ -205,9 +205,9 @@ img { display: block; max-width: 100%; }
    but the photos are smaller and shown in full COLOUR. */
 .home-shead {
   font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .12em;
-  color: var(--muted); text-align: center; margin: 0 0 22px;
+  color: var(--muted); text-align: left; padding: 0 var(--pad); margin: 0 0 22px;
 }
-.wsection { padding: calc(62px + 40px) var(--pad) 6px; }
+.wsection { padding: calc(62px + 40px) 0 6px; }
 .wsection + .home-shead { margin-top: 48px; }   /* separate the "Projects" heading from workers */
 
 /* grid of small full-colour worker cards (rows & columns) */
