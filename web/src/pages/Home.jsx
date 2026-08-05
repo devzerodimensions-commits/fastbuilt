@@ -75,6 +75,8 @@ export default function Home() {
         <div className="loading">Loading projects…</div>
       ) : (
         <div className="page-scale" ref={scaleRef}>
+        {/* one scroll-scale group so workers + projects breathe together on scroll */}
+        <div className="scroll-area">
         {/* WORKERS container — heading + worker photos */}
         <section className="workers-home">
           <h2>Our Workforce</h2>
@@ -123,6 +125,7 @@ export default function Home() {
               </div>
             )
           })}
+        </div>
         </div>
         <Footer />
         </div>

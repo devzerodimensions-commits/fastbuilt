@@ -8,8 +8,8 @@ export default function useHomeMotion(scaleRef, deps = []) {
   useEffect(() => {
     const wrap = scaleRef.current
     if (!wrap) return
-    // scale ONLY the project list — never the footer (so the footer can't get clipped)
-    const scaleTarget = wrap.querySelector('.projects') || wrap
+    // scale the whole scroll group (workers + projects) together — never the footer
+    const scaleTarget = wrap.querySelector('.scroll-area') || wrap.querySelector('.projects') || wrap
 
     const lenis = new Lenis({ duration: 1.15, smoothWheel: true, wheelMultiplier: 1 })
     window.__lenis = lenis     // exposed so "Back to top" can scroll smoothly

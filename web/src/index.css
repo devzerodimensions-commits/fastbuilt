@@ -170,7 +170,7 @@ img { display: block; max-width: 100%; }
 
 /* ===================== PROJECT LIST (reference style) ===================== */
 .page-scale { transform-origin: 50% 50%; }
-.projects { will-change: transform; }
+.scroll-area { will-change: transform; }
 .projects {
   margin: 0;
   padding: 20px var(--pad) 40px;   /* workers container above provides the header spacing */
