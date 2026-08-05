@@ -173,7 +173,39 @@ img { display: block; max-width: 100%; }
 .projects { will-change: transform; }
 .projects {
   margin: 0;
-  padding: calc(62px + 48px) var(--pad) 40px;
+  padding: 20px var(--pad) 40px;   /* workers container above provides the header spacing */
+}
+
+/* ===================== HOME WORKERS CONTAINER ===================== */
+.workers-home { padding: calc(62px + 40px) var(--pad) 10px; }
+.workers-home > h2 {
+  font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .12em;
+  color: var(--muted); text-align: center; margin: 0 0 26px;
+}
+.wh-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 240px));
+  gap: clamp(14px, 2vw, 26px);
+  justify-content: center;
+}
+.wh-card { margin: 0; }
+.wh-img { aspect-ratio: 4 / 5; overflow: hidden; background: #eee; border-radius: 3px; }
+.wh-img img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  filter: grayscale(100%);                                   /* B&W by default */
+  transition: filter .5s ease, transform .6s cubic-bezier(.2,.8,.2,1);
+}
+.wh-card:hover .wh-img img { filter: grayscale(0%); transform: scale(1.04); }   /* colour on hover */
+.wh-cap { display: flex; flex-direction: column; text-align: center; margin-top: 10px; }
+.wh-name { font-size: 15px; font-weight: 600; color: #111; letter-spacing: -0.01em; }
+.wh-role { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-top: 4px; }
+
+@media (max-width: 760px) {
+  .workers-home { padding-top: calc(62px + 24px); }
+  .wh-grid { grid-template-columns: repeat(2, minmax(0, 220px)); }
+}
+@media (max-width: 460px) {
+  .wh-grid { grid-template-columns: repeat(2, 1fr); }
 }
 .prow {
   display: grid;
