@@ -5,6 +5,7 @@ import CategoryIcon from '../components/CategoryIcon'
 import InlineProject from '../components/InlineProject'
 import useHomeMotion from '../lib/useHomeMotion'
 import { fetchProjects, imgColor, imgLQIP } from '../lib/projects'
+import { WORKERS, imgWorker } from '../lib/workers'
 
 export default function Home() {
   const [projects, setProjects] = useState([])
@@ -74,6 +75,23 @@ export default function Home() {
         <div className="loading">Loading projects…</div>
       ) : (
         <div className="page-scale" ref={scaleRef}>
+        {/* WORKERS — same row alignment as projects, but smaller + full colour */}
+        <section className="wsection">
+          <h2 className="home-shead">Our Workforce</h2>
+          {WORKERS.map((w) => (
+            <div className="wrow" key={w.img}>
+              <div className="wmeta">
+                <div className="wname">{w.name}</div>
+                <div className="wrole">{w.role}</div>
+              </div>
+              <div className="wimg">
+                <img src={imgWorker(w.img)} alt={w.name} loading="lazy" />
+              </div>
+            </div>
+          ))}
+        </section>
+
+        <h2 className="home-shead">Projects</h2>
         <div className="projects">
           {filtered.map((p, i) => {
             const open = p.slug === openSlug
