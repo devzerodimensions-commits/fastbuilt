@@ -214,7 +214,7 @@ img { display: block; max-width: 100%; }
 .whome-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 210px));
-  gap: clamp(16px, 2vw, 30px);
+  gap: clamp(8px, 1vw, 14px);
   justify-content: center;
 }
 .whome-card { margin: 0; }
@@ -234,7 +234,7 @@ img { display: block; max-width: 100%; }
   .whome-grid { grid-template-columns: repeat(2, minmax(0, 200px)); }
 }
 @media (max-width: 460px) {
-  .whome-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .whome-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
 }
 /* blur-up placeholder (LQIP) shows first, real image fades in over it */
 .lqip {
