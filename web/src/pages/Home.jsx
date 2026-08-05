@@ -77,21 +77,33 @@ export default function Home() {
         <div className="page-scale" ref={scaleRef}>
         {/* one scroll-scale group so workers + projects breathe together on scroll */}
         <div className="scroll-area">
-        {/* WORKERS container — heading + worker photos */}
+        {/* WORKERS — project-row style: icon + heading + subtitle on the LEFT, grid on the right */}
         <section className="workers-home">
-          <h2>Our Workforce</h2>
-          <div className="wh-grid">
-            {WORKERS.map((w) => (
-              <figure className="wh-card" key={w.img}>
-                <div className="wh-img">
-                  <img src={imgWorker(w.img)} alt={w.name} loading="lazy" />
-                </div>
-                <figcaption className="wh-cap">
-                  <span className="wh-name">{w.name}</span>
-                  <span className="wh-role">{w.role}</span>
-                </figcaption>
-              </figure>
-            ))}
+          <div className="wrow">
+            <div className="wmeta">
+              <span className="wicon">
+                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="40" height="40" fill="#111" />
+                  <circle cx="20" cy="16" r="4.6" stroke="#fff" strokeWidth="1.8" />
+                  <path d="M11 30c0-5 4-8.5 9-8.5s9 3.5 9 8.5" stroke="#fff" strokeWidth="1.8" />
+                </svg>
+              </span>
+              <div className="wname">Our Workforce</div>
+              <div className="wrole">On-site Team</div>
+            </div>
+            <div className="wh-grid">
+              {WORKERS.map((w) => (
+                <figure className="wh-card" key={w.img}>
+                  <div className="wh-img">
+                    <img src={imgWorker(w.img)} alt={w.name} loading="lazy" />
+                  </div>
+                  <figcaption className="wh-cap">
+                    <span className="wh-name">{w.name}</span>
+                    <span className="wh-role">{w.role}</span>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
           </div>
         </section>
 
