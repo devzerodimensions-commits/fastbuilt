@@ -5,14 +5,12 @@ import CategoryIcon from '../components/CategoryIcon'
 import InlineProject from '../components/InlineProject'
 import useHomeMotion from '../lib/useHomeMotion'
 import { fetchProjects, imgColor, imgLQIP } from '../lib/projects'
-import { WORKERS, imgWorker } from '../lib/workers'
 
 export default function Home() {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [openSlug, setOpenSlug] = useState(null)
   const [flipFrom, setFlipFrom] = useState(null)   // clicked thumbnail's rect (for the FLIP grow)
-  const [wOpen, setWOpen] = useState(false)        // workers grid grow-on-click (no scroll, no info)
   const [params] = useSearchParams()
   const active = params.get('cat') || 'All'
   const scaleRef = useRef(null)
@@ -76,43 +74,6 @@ export default function Home() {
         <div className="loading">Loading projects…</div>
       ) : (
         <div className="page-scale" ref={scaleRef}>
-        {/* WORKERS — project-row style: icon + heading left, worker grid (project-sized) centre */}
-        <section className="wsection">
-          <div className="wrow">
-            <div className="wmeta">
-              <span className="wicon">
-                <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect width="40" height="40" fill="#111" />
-                  <circle cx="20" cy="16" r="4.6" stroke="#fff" strokeWidth="1.8" />
-                  <path d="M11 30c0-5 4-8.5 9-8.5s9 3.5 9 8.5" stroke="#fff" strokeWidth="1.8" />
-                </svg>
-              </span>
-              <div className="wname">Our Workforce</div>
-              <div className="wrole">On-site Team</div>
-            </div>
-            <div
-              className={`whome-grid ${wOpen ? 'open' : ''}`}
-              role="button"
-              tabIndex={0}
-              onClick={() => setWOpen((o) => !o)}
-              onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), setWOpen((o) => !o))}
-            >
-              {WORKERS.map((w) => (
-                <figure className="whome-card" key={w.img}>
-                  <div className="whome-img">
-                    <img src={imgWorker(w.img)} alt={w.name} loading="lazy" />
-                  </div>
-                  <figcaption className="whome-cap">
-                    <span className="whome-name">{w.name}</span>
-                    <span className="whome-role">{w.role}</span>
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <h2 className="home-shead">Projects</h2>
         <div className="projects">
           {filtered.map((p, i) => {
             const open = p.slug === openSlug
