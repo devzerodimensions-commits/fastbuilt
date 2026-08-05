@@ -5,7 +5,7 @@ import CategoryIcon from '../components/CategoryIcon'
 import InlineProject from '../components/InlineProject'
 import useHomeMotion from '../lib/useHomeMotion'
 import { fetchProjects, imgColor, imgLQIP } from '../lib/projects'
-import { WORKERS, imgWorker } from '../lib/workers'
+import { WORKERS } from '../lib/workers'
 
 export default function Home() {
   const [projects, setProjects] = useState([])
@@ -75,12 +75,12 @@ export default function Home() {
         <div className="loading">Loading projects…</div>
       ) : (
         <div className="page-scale" ref={scaleRef}>
-        {/* WORKERS — exactly the project-row layout: icon + name + role left, image right */}
+        {/* WORKERS — one section, column & row grid: black-square icon + heading (name) */}
         <section className="wsection">
           <h2 className="home-shead">Our Workforce</h2>
-          {WORKERS.map((w) => (
-            <div className="wrow" key={w.img}>
-              <div className="wmeta">
+          <div className="wgrid">
+            {WORKERS.map((w) => (
+              <div className="witem" key={w.img}>
                 <span className="wicon">
                   <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <rect width="40" height="40" fill="#111" />
@@ -88,14 +88,13 @@ export default function Home() {
                     <path d="M11 30c0-5 4-8.5 9-8.5s9 3.5 9 8.5" stroke="#fff" strokeWidth="1.8" />
                   </svg>
                 </span>
-                <div className="wname">{w.name}</div>
-                <div className="wrole">{w.role}</div>
+                <div className="wtext">
+                  <div className="wname">{w.name}</div>
+                  <div className="wrole">{w.role}</div>
+                </div>
               </div>
-              <div className="wimg">
-                <img src={imgWorker(w.img)} alt={w.name} loading="lazy" />
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </section>
 
         <h2 className="home-shead">Projects</h2>
