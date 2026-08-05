@@ -75,22 +75,27 @@ export default function Home() {
         <div className="loading">Loading projects…</div>
       ) : (
         <div className="page-scale" ref={scaleRef}>
-        {/* WORKERS — shown as a grid (rows & columns), small full-colour cards */}
+        {/* WORKERS — exactly the project-row layout: icon + name + role left, image right */}
         <section className="wsection">
           <h2 className="home-shead">Our Workforce</h2>
-          <div className="whome-grid">
-            {WORKERS.map((w) => (
-              <figure className="whome-card" key={w.img}>
-                <div className="whome-img">
-                  <img src={imgWorker(w.img)} alt={w.name} loading="lazy" />
-                </div>
-                <figcaption className="whome-cap">
-                  <span className="whome-name">{w.name}</span>
-                  <span className="whome-role">{w.role}</span>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
+          {WORKERS.map((w) => (
+            <div className="wrow" key={w.img}>
+              <div className="wmeta">
+                <span className="wicon">
+                  <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="40" height="40" fill="#111" />
+                    <circle cx="20" cy="16" r="4.6" stroke="#fff" strokeWidth="1.8" />
+                    <path d="M11 30c0-5 4-8.5 9-8.5s9 3.5 9 8.5" stroke="#fff" strokeWidth="1.8" />
+                  </svg>
+                </span>
+                <div className="wname">{w.name}</div>
+                <div className="wrole">{w.role}</div>
+              </div>
+              <div className="wimg">
+                <img src={imgWorker(w.img)} alt={w.name} loading="lazy" />
+              </div>
+            </div>
+          ))}
         </section>
 
         <h2 className="home-shead">Projects</h2>
