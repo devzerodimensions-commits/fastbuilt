@@ -19,15 +19,34 @@ export default function InlineProject({ project: p, flipFrom, onClose }) {
 
   // FLIP: morph the SAME image from the clicked thumbnail's rect -> its open rect
   // (grows in place, no swap/pause) and colourise B&W -> colour during the move.
-  // The first hero panel is full-width (CSS: min-width:100%) and centres the whole
-  // image within the viewing area (CSS: justify-content:center + max-width/height).
-  // So centring needs no fragile JS math — just make sure we start un-scrolled.
+  // PAGE-centre the first image so it lines up with the closed thumbnails above/below.
+  // The closed thumbnails sit in the dead-centre grid column of .projects, so "centre"
+  // means the .projects horizontal centre (== screen centre; the scale origin is 50%).
+  // Measure ONLY in unscaled layout space (offsetLeft/clientWidth/clientHeight ignore the
+  // scroll-shrink transform) and size the image so it always fits page-centred.
   const centreImage = () => {
-    const el = ref.current
+    const el = ref.current                                   // .pinline-scroll
     if (!el) return
     const heroPanel = el.querySelector('.ph-hero')
-    if (heroPanel) heroPanel.style.marginLeft = ''   // clear any stale inline margin
+    const img = heroPanel && heroPanel.querySelector('img')
+    if (!heroPanel || !img) return
+    heroPanel.style.marginLeft = '0px'
     el.scrollLeft = 0
+    const col = el.closest('.projects') || el.offsetParent
+    if (!col) return
+    const absLeft = (n) => { let x = 0; for (let m = n; m; m = m.offsetParent) x += m.offsetLeft; return x }
+    const scrollLeft = absLeft(el) - absLeft(col)            // scroll strip's left within the column
+    const pageCentre = col.clientWidth / 2                   // == screen centre
+    // half-width available for a page-centred image (can't spill past the strip's edges)
+    const maxHalf = Math.max(0, Math.min(pageCentre - scrollLeft, scrollLeft + el.clientWidth - pageCentre))
+    const aspect = (img.naturalWidth && img.naturalHeight) ? img.naturalWidth / img.naturalHeight : 1.4
+    const halfFromHeight = (el.clientHeight * aspect) / 2    // half-width at full strip height
+    const half = Math.max(0, Math.min(halfFromHeight, maxHalf))
+    // size the image (height follows via aspect) and page-centre it via the panel margin
+    img.style.width = (half * 2) + 'px'
+    img.style.height = 'auto'
+    const imgLeft = absLeft(img) - absLeft(col)              // image left within the column (margin still 0)
+    heroPanel.style.marginLeft = Math.max(0, pageCentre - half - imgLeft) + 'px'
   }
 
   // FLIP: page-centre the image, then morph the SAME image from the thumbnail rect
