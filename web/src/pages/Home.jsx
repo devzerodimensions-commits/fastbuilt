@@ -12,6 +12,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [openSlug, setOpenSlug] = useState(null)
   const [flipFrom, setFlipFrom] = useState(null)   // clicked thumbnail's rect (for the FLIP grow)
+  const [wOpen, setWOpen] = useState(false)        // Our Workforce grid grow-on-click (opens like a project)
   const [params] = useSearchParams()
   const active = params.get('cat') || 'All'
   const scaleRef = useRef(null)
@@ -91,7 +92,13 @@ export default function Home() {
               <div className="wname">Our Workforce</div>
               <div className="wrole">On-site Team</div>
             </div>
-            <div className="wh-grid">
+            <div
+              className={`wh-grid ${wOpen ? 'open' : ''}`}
+              role="button"
+              tabIndex={0}
+              onClick={() => setWOpen((o) => !o)}
+              onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), setWOpen((o) => !o))}
+            >
               {WORKERS.map((w) => (
                 <figure className="wh-card" key={w.img}>
                   <div className="wh-img">
