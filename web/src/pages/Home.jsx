@@ -12,6 +12,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [openSlug, setOpenSlug] = useState(null)
   const [flipFrom, setFlipFrom] = useState(null)   // clicked thumbnail's rect (for the FLIP grow)
+  const [wOpen, setWOpen] = useState(false)        // workforce: project-size default, grows big on click
   const [params] = useSearchParams()
   const active = params.get('cat') || 'All'
   const scaleRef = useRef(null)
@@ -79,7 +80,13 @@ export default function Home() {
         <div className="scroll-area">
         {/* WORKERS — zoomed-in hero grid (no side heading); projects sit below the fold */}
         <section className="workers-home">
-          <div className="wh-grid">
+          <div
+            className={`wh-grid ${wOpen ? 'open' : ''}`}
+            role="button"
+            tabIndex={0}
+            onClick={() => setWOpen((o) => !o)}
+            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), setWOpen((o) => !o))}
+          >
             {WORKERS.map((w) => (
               <figure className="wh-card" key={w.img}>
                 <div className="wh-img">
