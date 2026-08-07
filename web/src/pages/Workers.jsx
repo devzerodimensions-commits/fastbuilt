@@ -1,7 +1,11 @@
+import { useEffect, useState } from 'react'
 import Footer from '../components/Footer'
-import { WORKERS, imgWorker } from '../lib/workers'
+import { fetchWorkers, imgWorker } from '../lib/workers'
 
 export default function Workers() {
+  const [workers, setWorkers] = useState([])
+  useEffect(() => { fetchWorkers().then(setWorkers) }, [])
+
   return (
     <>
       <section className="team-head">
@@ -10,10 +14,10 @@ export default function Workers() {
       </section>
 
       <div className="team-grid workers-grid">
-        {WORKERS.map((w) => (
-          <figure className="team-card" key={w.img}>
+        {workers.map((w) => (
+          <figure className="team-card" key={w.id ?? w.image}>
             <div className="team-img">
-              <img src={imgWorker(w.img)} alt={w.name} loading="lazy" />
+              <img src={imgWorker(w.image)} alt={w.name} loading="lazy" />
             </div>
             <figcaption className="team-cap">
               <span className="tc-name">{w.name}</span>

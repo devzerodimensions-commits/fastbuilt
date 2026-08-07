@@ -1,3 +1,5 @@
+import { apiUrl } from './api'
+
 // Categories provided by client
 export const CATEGORIES = ['PEB', 'Civil', 'Container Structures', 'Other Works']
 
@@ -90,13 +92,15 @@ export const SAMPLE_PROJECTS = [
   },
 ]
 
-export function imgColor(key) { return `/images/color/${key}.jpg` }
-export function imgBW(key) { return `/images/bw/${key}.jpg` }
-export function imgLQIP(key) { return `/images/lqip/${key}.jpg` }
+// A stored image can be a full URL (Cloudinary) or a legacy key -> /images/color/<key>.jpg
+const isUrl = (v) => typeof v === 'string' && (/^https?:\/\//.test(v) || v.startsWith('/'))
+export function imgColor(key) { return isUrl(key) ? key : `/images/color/${key}.jpg` }
+export function imgBW(key) { return isUrl(key) ? key : `/images/bw/${key}.jpg` }
+export function imgLQIP(key) { return isUrl(key) ? key : `/images/lqip/${key}.jpg` }
 
 export async function fetchProjects() {
   try {
-    const res = await fetch('/api/projects')
+    const res = await fetch(apiUrl('/api/projects'))
     if (!res.ok) throw new Error('bad status')
     const data = await res.json()
     if (Array.isArray(data) && data.length) return data

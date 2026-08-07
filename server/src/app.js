@@ -2,15 +2,20 @@ import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import projectsRouter from './routes/projects.js'
+import authRouter from './routes/auth.js'
+import peopleCrud from './routes/peopleCrud.js'
 
 dotenv.config()
 
 const app = express()
 app.use(cors({ origin: process.env.CLIENT_ORIGIN || '*' }))
-app.use(express.json())
+app.use(express.json({ limit: '2mb' }))
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }))
+app.use('/api/auth', authRouter)
 app.use('/api/projects', projectsRouter)
+app.use('/api/workers', peopleCrud('workers'))
+app.use('/api/team', peopleCrud('team'))
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, _req, res, _next) => {

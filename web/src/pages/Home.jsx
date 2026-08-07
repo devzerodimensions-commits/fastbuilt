@@ -5,16 +5,19 @@ import CategoryIcon from '../components/CategoryIcon'
 import InlineProject from '../components/InlineProject'
 import useHomeMotion from '../lib/useHomeMotion'
 import { fetchProjects, imgColor, imgLQIP } from '../lib/projects'
-import { WORKERS, imgWorker } from '../lib/workers'
+import { fetchWorkers, imgWorker } from '../lib/workers'
 
 export default function Home() {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [openSlug, setOpenSlug] = useState(null)
   const [flipFrom, setFlipFrom] = useState(null)   // clicked thumbnail's rect (for the FLIP grow)
+  const [workers, setWorkers] = useState([])
   const [params] = useSearchParams()
   const active = params.get('cat') || 'All'
   const scaleRef = useRef(null)
+
+  useEffect(() => { fetchWorkers().then(setWorkers) }, [])
 
   useEffect(() => {
     fetchProjects().then((p) => {
@@ -80,10 +83,10 @@ export default function Home() {
         {/* WORKERS — zoomed-in hero grid (no side heading); projects sit below the fold */}
         <section className="workers-home">
           <div className="wh-grid">
-            {WORKERS.map((w) => (
-              <figure className="wh-card" key={w.img}>
+            {workers.map((w, i) => (
+              <figure className="wh-card" key={w.id ?? i}>
                 <div className="wh-img">
-                  <img src={imgWorker(w.img)} alt={w.name} loading="lazy" />
+                  <img src={imgWorker(w.image)} alt={w.name} loading="lazy" />
                 </div>
                 <figcaption className="wh-cap">
                   <span className="wh-name">{w.name}</span>
