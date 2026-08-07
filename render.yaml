@@ -1,7 +1,37 @@
-# Render Blueprint — Fastbuilt (static site)
-# The frontend is fully self-contained (bundled sample data), so no backend/DB
-# is needed just to host & share the site.
+# Render Blueprint — Fastbuilt (frontend + admin API + PostgreSQL)
+# Apply this in the Render dashboard (Blueprints -> the fastbuilt repo -> Apply).
+# You only need to fill ADMIN_PASS (marked sync:false) when prompted.
+
+databases:
+  - name: fastbuilt-db
+    plan: free
+    databaseName: fastbuilt
+    user: fastbuilt
+
 services:
+  # ---- Admin API (Node + Express) ----
+  - name: fastbuilt-api
+    type: web
+    runtime: node
+    rootDir: server
+    plan: free
+    buildCommand: npm install && node db/init.js   # create tables + seed sample content if empty
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: fastbuilt-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_USER
+        value: admin
+      - key: ADMIN_PASS
+        sync: false                # set a strong password in the Render dashboard
+      - key: CLIENT_ORIGIN
+        value: "*"
+
+  # ---- Website (static React) ----
   - name: fastbuilt
     type: web
     runtime: static
@@ -9,6 +39,13 @@ services:
     buildCommand: npm install && npm run build
     staticPublishPath: dist
     pullRequestPreviewsEnabled: false
+    envVars:
+      - key: VITE_API_URL
+        value: https://fastbuilt-api.onrender.com   # the API service URL above
+      - key: VITE_CLOUDINARY_CLOUD_NAME
+        sync: false                # optional — for image uploads in the dashboard
+      - key: VITE_CLOUDINARY_PRESET
+        sync: false                # optional
     routes:
       - type: rewrite
         source: /*
