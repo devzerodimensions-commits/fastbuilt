@@ -5,10 +5,9 @@ import { CATEGORIES } from '../../lib/projects'
 import ImageField from './ImageField'
 import './admin.css'
 
-// field config per resource
 const RESOURCES = {
   projects: {
-    label: 'Projects',
+    label: 'Projects', single: 'Project',
     columns: ['name', 'category', 'location', 'year'],
     fields: [
       { key: 'name', label: 'Name', required: true },
@@ -26,7 +25,7 @@ const RESOURCES = {
     ],
   },
   workers: {
-    label: 'Workers',
+    label: 'Workers', single: 'Worker',
     columns: ['name', 'role'],
     fields: [
       { key: 'name', label: 'Name', required: true },
@@ -36,7 +35,7 @@ const RESOURCES = {
     ],
   },
   team: {
-    label: 'Team',
+    label: 'Team', single: 'Team member',
     columns: ['name', 'role'],
     fields: [
       { key: 'name', label: 'Name', required: true },
@@ -47,97 +46,169 @@ const RESOURCES = {
   },
 }
 
+const ICONS = {
+  dashboard: <path d="M3 3h7v7H3V3zm0 11h7v7H3v-7zm11 0h7v7h-7v-7zm0-11h7v7h-7V3z" />,
+  projects: <path d="M4 21V9l8-6 8 6v12h-6v-6h-4v6H4z" />,
+  workers: <path d="M12 12a4 4 0 100-8 4 4 0 000 8zm0 2c-4 0-8 2-8 5v1h16v-1c0-3-4-5-8-5z" />,
+  team: <path d="M8 11a3 3 0 100-6 3 3 0 000 6zm8 0a3 3 0 100-6 3 3 0 000 6zM2 19c0-2.5 3-4 6-4s6 1.5 6 4v1H2v-1zm12.5-3.9c2.3.4 4.5 1.7 4.5 3.9v1h3v-1c0-2.3-3.2-3.6-6-3.9z" />,
+}
+const Icon = ({ name }) => (
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">{ICONS[name]}</svg>
+)
+
 export default function AdminDashboard() {
   const nav = useNavigate()
-  const [tab, setTab] = useState('projects')
-  const [items, setItems] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [editing, setEditing] = useState(null)   // item object being edited, {} for new, null for none
+  const [view, setView] = useState('dashboard')
+  const [counts, setCounts] = useState(null)
   const [msg, setMsg] = useState('')
 
   useEffect(() => { if (!isLoggedIn()) nav('/admin/login') }, [nav])
 
+  const loadCounts = useCallback(async () => {
+    try {
+      const [p, w, t] = await Promise.all([listItems('projects'), listItems('workers'), listItems('team')])
+      setCounts({ projects: p.length, workers: w.length, team: t.length })
+    } catch { setCounts({ projects: 0, workers: 0, team: 0 }) }
+  }, [])
+
+  useEffect(() => { loadCounts() }, [loadCounts])
+
+  const logout = () => { clearToken(); nav('/admin/login') }
+  const flash = (m) => setMsg(m)
+
+  const menu = [
+    { key: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
+    { key: 'projects', label: 'Projects', icon: 'projects' },
+    { key: 'workers', label: 'Workers', icon: 'workers' },
+    { key: 'team', label: 'Team', icon: 'team' },
+  ]
+
+  return (
+    <div className="wp">
+      <aside className="wp-side">
+        <div className="wp-brand">Fastbuilt<span>admin</span></div>
+        <nav className="wp-menu">
+          {menu.map((m) => (
+            <button key={m.key} className={view === m.key ? 'active' : ''} onClick={() => setView(m.key)}>
+              <Icon name={m.icon} /> <span>{m.label}</span>
+            </button>
+          ))}
+        </nav>
+        <button className="wp-logout" onClick={logout}>↩ Log out</button>
+      </aside>
+
+      <div className="wp-body">
+        <header className="wp-topbar">
+          <div className="wp-crumb">{view === 'dashboard' ? 'Dashboard' : RESOURCES[view].label}</div>
+          <div className="wp-top-right">
+            <a href="/" target="_blank" rel="noreferrer" className="wp-visit">↗ Visit site</a>
+            <span className="wp-user">👤 admin</span>
+          </div>
+        </header>
+
+        <main className="wp-main">
+          {view === 'dashboard'
+            ? <Overview counts={counts} go={setView} />
+            : <ResourceManager key={view} resource={view} cfg={RESOURCES[view]} onChanged={loadCounts} flash={flash} />}
+        </main>
+      </div>
+
+      {msg && <div className="wp-toast" onAnimationEnd={() => setMsg('')}>{msg}</div>}
+    </div>
+  )
+}
+
+function Overview({ counts, go }) {
+  const cards = [
+    { key: 'projects', label: 'Projects', icon: 'projects', color: '#2271b1' },
+    { key: 'workers', label: 'Workers', icon: 'workers', color: '#00a32a' },
+    { key: 'team', label: 'Team', icon: 'team', color: '#8c5e58' },
+  ]
+  return (
+    <>
+      <h1 className="wp-h1">Welcome back 👋</h1>
+      <p className="wp-sub">Manage your website content below. Changes go live on the site automatically.</p>
+      <div className="wp-cards">
+        {cards.map((c) => (
+          <button key={c.key} className="wp-card" onClick={() => go(c.key)} style={{ '--c': c.color }}>
+            <span className="wp-card-ic"><Icon name={c.icon} /></span>
+            <span className="wp-card-n">{counts ? counts[c.key] : '—'}</span>
+            <span className="wp-card-l">{c.label}</span>
+            <span className="wp-card-go">Manage →</span>
+          </button>
+        ))}
+      </div>
+    </>
+  )
+}
+
+function ResourceManager({ resource, cfg, onChanged, flash }) {
+  const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [editing, setEditing] = useState(null)
+
   const load = useCallback(async () => {
     setLoading(true)
-    try { setItems(await listItems(tab)) }
-    catch (e) { setMsg(e.message) }
+    try { setItems(await listItems(resource)) }
+    catch (e) { flash(e.message) }
     finally { setLoading(false) }
-  }, [tab])
+  }, [resource, flash])
 
-  useEffect(() => { load(); setEditing(null) }, [load])
-
-  const cfg = RESOURCES[tab]
+  useEffect(() => { load() }, [load])
 
   const onDelete = async (item) => {
     if (!confirm(`Delete "${item.name}"? This cannot be undone.`)) return
-    try { await deleteItem(tab, item.id); await load(); setMsg('Deleted') }
-    catch (e) { setMsg(e.message) }
+    try { await deleteItem(resource, item.id); await load(); onChanged(); flash('Deleted') }
+    catch (e) { flash(e.message) }
   }
-
   const onSave = async (data) => {
     try {
-      if (editing.id) await updateItem(tab, editing.id, data)
-      else await createItem(tab, data)
-      setEditing(null); await load(); setMsg('Saved')
-    } catch (e) { setMsg(e.message) }
+      if (editing.id) await updateItem(resource, editing.id, data)
+      else await createItem(resource, data)
+      setEditing(null); await load(); onChanged(); flash('Saved')
+    } catch (e) { flash(e.message) }
   }
 
-  const logout = () => { clearToken(); nav('/admin/login') }
+  const imgSrc = (v) => !v ? null : (v.startsWith('http') || v.startsWith('/') ? v : `/images/color/${v}.jpg`)
 
   return (
-    <div className="admin">
-      <header className="admin-top">
-        <div className="admin-brand">Fastbuilt Admin</div>
-        <nav className="admin-tabs">
-          {Object.entries(RESOURCES).map(([k, r]) => (
-            <button key={k} className={tab === k ? 'active' : ''} onClick={() => setTab(k)}>{r.label}</button>
-          ))}
-        </nav>
-        <button className="admin-logout" onClick={logout}>Log out</button>
-      </header>
+    <>
+      <div className="wp-head">
+        <h1 className="wp-h1">{cfg.label} <span className="wp-count">{items.length}</span></h1>
+        <button className="wp-btn" onClick={() => setEditing({})}>+ Add {cfg.single}</button>
+      </div>
 
-      {msg && <div className="admin-msg" onAnimationEnd={() => setMsg('')}>{msg}</div>}
-
-      <main className="admin-main">
-        <div className="admin-head">
-          <h2>{cfg.label} <span className="admin-count">{items.length}</span></h2>
-          <button className="btn-primary" onClick={() => setEditing({})}>+ Add {cfg.label.replace(/s$/, '')}</button>
-        </div>
-
-        {loading ? (
-          <div className="admin-loading">Loading…</div>
-        ) : (
-          <table className="admin-table">
+      {loading ? <div className="wp-loading">Loading…</div> : (
+        <div className="wp-table-wrap">
+          <table className="wp-table">
             <thead>
               <tr>
-                <th></th>
+                <th className="wp-th-img"></th>
                 {cfg.columns.map((c) => <th key={c}>{c.replace('_', ' ')}</th>)}
-                <th></th>
+                <th className="wp-th-act"></th>
               </tr>
             </thead>
             <tbody>
               {items.map((it) => (
                 <tr key={it.id}>
-                  <td className="admin-imgcell">
-                    {it.image ? <img src={it.image.startsWith('http') || it.image.startsWith('/') ? it.image : `/images/color/${it.image}.jpg`} alt="" onError={(e) => (e.currentTarget.style.visibility = 'hidden')} /> : '—'}
-                  </td>
+                  <td className="wp-td-img">{imgSrc(it.image)
+                    ? <img src={imgSrc(it.image)} alt="" onError={(e) => (e.currentTarget.style.visibility = 'hidden')} />
+                    : <span className="wp-noimg">—</span>}</td>
                   {cfg.columns.map((c) => <td key={c}>{it[c]}</td>)}
-                  <td className="admin-actions">
+                  <td className="wp-td-act">
                     <button onClick={() => setEditing(it)}>Edit</button>
                     <button className="danger" onClick={() => onDelete(it)}>Delete</button>
                   </td>
                 </tr>
               ))}
-              {!items.length && <tr><td colSpan={cfg.columns.length + 2} className="admin-empty">No {cfg.label.toLowerCase()} yet.</td></tr>}
+              {!items.length && <tr><td colSpan={cfg.columns.length + 2} className="wp-empty">No {cfg.label.toLowerCase()} yet. Click “Add {cfg.single}”.</td></tr>}
             </tbody>
           </table>
-        )}
-      </main>
-
-      {editing && (
-        <ItemForm cfg={cfg} initial={editing} onCancel={() => setEditing(null)} onSave={onSave} />
+        </div>
       )}
-    </div>
+
+      {editing && <ItemForm cfg={cfg} initial={editing} onCancel={() => setEditing(null)} onSave={onSave} />}
+    </>
   )
 }
 
@@ -145,18 +216,12 @@ function ItemForm({ cfg, initial, onCancel, onSave }) {
   const [form, setForm] = useState(() => ({ ...initial }))
   const [busy, setBusy] = useState(false)
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }))
-
-  const submit = async (e) => {
-    e.preventDefault()
-    setBusy(true)
-    await onSave(form)
-    setBusy(false)
-  }
+  const submit = async (e) => { e.preventDefault(); setBusy(true); await onSave(form); setBusy(false) }
 
   return (
-    <div className="admin-modal" onMouseDown={onCancel}>
-      <form className="admin-form" onMouseDown={(e) => e.stopPropagation()} onSubmit={submit}>
-        <h3>{initial.id ? 'Edit' : 'Add'} {cfg.label.replace(/s$/, '')}</h3>
+    <div className="wp-modal" onMouseDown={onCancel}>
+      <form className="wp-form" onMouseDown={(e) => e.stopPropagation()} onSubmit={submit}>
+        <h3>{initial.id ? 'Edit' : 'Add'} {cfg.single}</h3>
         {cfg.fields.map((f) => (
           <div className="af-row" key={f.key}>
             {f.type === 'image' ? (
@@ -177,19 +242,15 @@ function ItemForm({ cfg, initial, onCancel, onSave }) {
             ) : (
               <>
                 <label>{f.label}{f.required && ' *'}</label>
-                <input
-                  type={f.type === 'number' ? 'number' : 'text'}
-                  value={form[f.key] ?? ''}
-                  onChange={(e) => set(f.key, f.type === 'number' ? Number(e.target.value) : e.target.value)}
-                  required={f.required}
-                />
+                <input type={f.type === 'number' ? 'number' : 'text'} value={form[f.key] ?? ''}
+                  onChange={(e) => set(f.key, f.type === 'number' ? Number(e.target.value) : e.target.value)} required={f.required} />
               </>
             )}
           </div>
         ))}
         <div className="af-buttons">
           <button type="button" onClick={onCancel}>Cancel</button>
-          <button type="submit" className="btn-primary" disabled={busy}>{busy ? 'Saving…' : 'Save'}</button>
+          <button type="submit" className="wp-btn" disabled={busy}>{busy ? 'Saving…' : 'Save'}</button>
         </div>
       </form>
     </div>
