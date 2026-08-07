@@ -34,5 +34,12 @@ CREATE TABLE IF NOT EXISTS team (
   created_at  TIMESTAMPTZ DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS categories (
+  id          SERIAL PRIMARY KEY,
+  name        TEXT UNIQUE NOT NULL,
+  sort_order  INTEGER DEFAULT 0,
+  created_at  TIMESTAMPTZ DEFAULT now()
+);
+
 -- second image column for older databases that predate it
 ALTER TABLE projects ADD COLUMN IF NOT EXISTS image2 TEXT;

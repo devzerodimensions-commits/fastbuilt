@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { CATEGORIES } from '../lib/projects'
+import { fetchCategories } from '../lib/projects'
 
 const CONTACT = {
   phone: '8347724798',
@@ -13,7 +13,10 @@ export default function Header() {
   const [params] = useSearchParams()
   const active = params.get('cat')
   const [menuOpen, setMenuOpen] = useState(false)
+  const [categories, setCategories] = useState([])
   const wrapRef = useRef(null)
+
+  useEffect(() => { fetchCategories().then(setCategories) }, [])
 
   // close the dropdown when clicking outside / pressing Escape
   useEffect(() => {
@@ -49,7 +52,7 @@ export default function Header() {
         {menuOpen && (
           <div className="menu-dropdown">
             <Link to="/" onClick={() => setMenuOpen(false)}>All Projects</Link>
-            {CATEGORIES.map((c) => (
+            {categories.map((c) => (
               <Link
                 key={c}
                 to={`/?cat=${encodeURIComponent(c)}`}

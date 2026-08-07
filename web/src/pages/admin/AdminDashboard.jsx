@@ -44,6 +44,14 @@ const RESOURCES = {
       { key: 'sort_order', label: 'Sort order', type: 'number' },
     ],
   },
+  categories: {
+    label: 'Categories', single: 'Category',
+    columns: ['name'],
+    fields: [
+      { key: 'name', label: 'Category name', required: true },
+      { key: 'sort_order', label: 'Sort order', type: 'number' },
+    ],
+  },
 }
 
 const ICONS = {
@@ -51,6 +59,7 @@ const ICONS = {
   projects: <path d="M4 21V9l8-6 8 6v12h-6v-6h-4v6H4z" />,
   workers: <path d="M12 12a4 4 0 100-8 4 4 0 000 8zm0 2c-4 0-8 2-8 5v1h16v-1c0-3-4-5-8-5z" />,
   team: <path d="M8 11a3 3 0 100-6 3 3 0 000 6zm8 0a3 3 0 100-6 3 3 0 000 6zM2 19c0-2.5 3-4 6-4s6 1.5 6 4v1H2v-1zm12.5-3.9c2.3.4 4.5 1.7 4.5 3.9v1h3v-1c0-2.3-3.2-3.6-6-3.9z" />,
+  categories: <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z" />,
 }
 const Icon = ({ name }) => (
   <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">{ICONS[name]}</svg>
@@ -60,15 +69,17 @@ export default function AdminDashboard() {
   const nav = useNavigate()
   const [view, setView] = useState('dashboard')
   const [counts, setCounts] = useState(null)
+  const [catOptions, setCatOptions] = useState([])
   const [msg, setMsg] = useState('')
 
   useEffect(() => { if (!isLoggedIn()) nav('/admin/login') }, [nav])
 
   const loadCounts = useCallback(async () => {
     try {
-      const [p, w, t] = await Promise.all([listItems('projects'), listItems('workers'), listItems('team')])
-      setCounts({ projects: p.length, workers: w.length, team: t.length })
-    } catch { setCounts({ projects: 0, workers: 0, team: 0 }) }
+      const [p, w, t, c] = await Promise.all([listItems('projects'), listItems('workers'), listItems('team'), listItems('categories')])
+      setCounts({ projects: p.length, workers: w.length, team: t.length, categories: c.length })
+      setCatOptions(c.map((x) => x.name))
+    } catch { setCounts({ projects: 0, workers: 0, team: 0, categories: 0 }) }
   }, [])
 
   useEffect(() => { loadCounts() }, [loadCounts])
@@ -81,6 +92,7 @@ export default function AdminDashboard() {
     { key: 'projects', label: 'Projects', icon: 'projects' },
     { key: 'workers', label: 'Workers', icon: 'workers' },
     { key: 'team', label: 'Team', icon: 'team' },
+    { key: 'categories', label: 'Categories', icon: 'categories' },
   ]
 
   return (
@@ -109,7 +121,7 @@ export default function AdminDashboard() {
         <main className="wp-main">
           {view === 'dashboard'
             ? <Overview counts={counts} go={setView} />
-            : <ResourceManager key={view} resource={view} cfg={RESOURCES[view]} onChanged={loadCounts} flash={flash} />}
+            : <ResourceManager key={view} resource={view} cfg={RESOURCES[view]} onChanged={loadCounts} flash={flash} categoryOptions={catOptions} />}
         </main>
       </div>
 
@@ -123,6 +135,7 @@ function Overview({ counts, go }) {
     { key: 'projects', label: 'Projects', icon: 'projects', color: '#2271b1' },
     { key: 'workers', label: 'Workers', icon: 'workers', color: '#00a32a' },
     { key: 'team', label: 'Team', icon: 'team', color: '#8c5e58' },
+    { key: 'categories', label: 'Categories', icon: 'categories', color: '#9a6700' },
   ]
   return (
     <>
@@ -142,7 +155,7 @@ function Overview({ counts, go }) {
   )
 }
 
-function ResourceManager({ resource, cfg, onChanged, flash }) {
+function ResourceManager({ resource, cfg, onChanged, flash, categoryOptions }) {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(null)
@@ -207,16 +220,17 @@ function ResourceManager({ resource, cfg, onChanged, flash }) {
         </div>
       )}
 
-      {editing && <ItemForm cfg={cfg} initial={editing} onCancel={() => setEditing(null)} onSave={onSave} />}
+      {editing && <ItemForm cfg={cfg} initial={editing} onCancel={() => setEditing(null)} onSave={onSave} categoryOptions={categoryOptions} />}
     </>
   )
 }
 
-function ItemForm({ cfg, initial, onCancel, onSave }) {
+function ItemForm({ cfg, initial, onCancel, onSave, categoryOptions }) {
   const [form, setForm] = useState(() => ({ ...initial }))
   const [busy, setBusy] = useState(false)
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }))
   const submit = async (e) => { e.preventDefault(); setBusy(true); await onSave(form); setBusy(false) }
+  const optionsFor = (f) => (f.key === 'category' && categoryOptions && categoryOptions.length ? categoryOptions : f.options)
 
   return (
     <div className="wp-modal" onMouseDown={onCancel}>
@@ -236,7 +250,7 @@ function ItemForm({ cfg, initial, onCancel, onSave }) {
                 <label>{f.label}{f.required && ' *'}</label>
                 <select value={form[f.key] || ''} onChange={(e) => set(f.key, e.target.value)} required={f.required}>
                   <option value="">— choose —</option>
-                  {f.options.map((o) => <option key={o} value={o}>{o}</option>)}
+                  {optionsFor(f).map((o) => <option key={o} value={o}>{o}</option>)}
                 </select>
               </>
             ) : (

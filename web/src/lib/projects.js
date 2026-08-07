@@ -1,7 +1,19 @@
 import { apiUrl } from './api'
 
-// Categories provided by client
+// Categories — fallback list (real ones come from /api/categories, managed in the dashboard)
 export const CATEGORIES = ['PEB', 'Civil', 'Container Structures', 'Other Works']
+
+export async function fetchCategories() {
+  try {
+    const res = await fetch(apiUrl('/api/categories'))
+    if (!res.ok) throw new Error('bad status')
+    const data = await res.json()
+    if (Array.isArray(data) && data.length) return data.map((c) => c.name)
+    throw new Error('empty')
+  } catch {
+    return CATEGORIES
+  }
+}
 
 // Fallback sample projects (used if the API is unreachable).
 // The real data is served from the Node/PostgreSQL backend at /api/projects.

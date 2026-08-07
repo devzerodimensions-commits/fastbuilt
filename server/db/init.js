@@ -46,6 +46,8 @@ const TEAM = [
   { name: 'Sanjay Pillai', role: 'Estimation Engineer', image: 'face20' },
 ]
 
+const CATEGORIES = ['PEB', 'Civil', 'Container Structures', 'Other Works']
+
 async function seedIfEmpty(table, rows, insert) {
   const { rows: c } = await pool.query(`SELECT COUNT(*)::int AS n FROM ${table}`)
   if (c[0].n > 0) { console.log(`• ${table}: ${c[0].n} rows, skip seed`); return }
@@ -69,6 +71,8 @@ async function init() {
     pool.query('INSERT INTO workers (name, role, image, sort_order) VALUES ($1,$2,$3,$4)', [w.name, w.role, w.image, o]))
   await seedIfEmpty('team', TEAM, (t, o) =>
     pool.query('INSERT INTO team (name, role, image, sort_order) VALUES ($1,$2,$3,$4)', [t.name, t.role, t.image, o]))
+  await seedIfEmpty('categories', CATEGORIES, (name, o) =>
+    pool.query('INSERT INTO categories (name, sort_order) VALUES ($1,$2)', [name, o]))
 
   await pool.end()
   console.log('✓ init complete')
