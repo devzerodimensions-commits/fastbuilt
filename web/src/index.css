@@ -184,11 +184,11 @@ img { display: block; max-width: 100%; }
 }
 .wh-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);   /* 5 x 2 = 10 photos */
-  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: repeat(5, 1fr);   /* 5 x 3 = 15 photos */
+  grid-template-rows: repeat(3, 1fr);
   gap: 0;
   width: min(880px, 92vw);             /* contained width (like before), centred */
-  aspect-ratio: 15 / 4;                /* 5 cols x 2 rows of 3:2 cells; height follows width */
+  aspect-ratio: 5 / 2;                 /* 5 cols x 3 rows of 3:2 cells; height follows width */
   height: auto;
   margin: 0 auto;
 }
@@ -219,10 +219,10 @@ img { display: block; max-width: 100%; }
 @media (max-width: 760px) {
   /* 2 x 5 = 10 photos, fills a tall phone screen without overflowing */
   .wh-grid {
-    grid-template-columns: repeat(2, 1fr);   /* 2 x 5 = 10 landscape cells */
+    grid-template-columns: repeat(3, 1fr);   /* 3 x 5 = 15 landscape cells */
     grid-template-rows: repeat(5, 1fr);
-    width: min(360px, 92vw);
-    aspect-ratio: 3 / 5;
+    width: min(420px, 94vw);
+    aspect-ratio: 9 / 10;
     height: auto;
   }
 }

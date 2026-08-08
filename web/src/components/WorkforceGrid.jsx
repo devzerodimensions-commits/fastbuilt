@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { fetchWorkers, imgWorker } from '../lib/workers'
 import { WORKFORCE_PHOTOS } from '../lib/workforcePhotos'
 
-const N = 10                // visible cells (5x2 desktop / 2x5 mobile)
+const N = 15                // visible cells (5x3 desktop / 3x5 mobile)
 const TICK = 1800           // ms between flips
 const HALF = 340            // ms half-flip (swap image at this point)
 const key = (x) => x?.id ?? x?.image
