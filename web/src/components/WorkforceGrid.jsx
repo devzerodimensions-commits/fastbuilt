@@ -3,9 +3,9 @@ import { fetchWorkers, imgWorker } from '../lib/workers'
 import { WORKFORCE_PHOTOS } from '../lib/workforcePhotos'
 
 const N = 15                // visible cells (5x3 desktop / 3x5 mobile)
-const TICK = 4200           // ms between fade batches (relaxed pace)
-const HALF = 1200           // ms — swap image after it has fully faded out (matches the 1.2s fade)
-const BATCH_MIN = 3, BATCH_MAX = 5   // how many random photos flip together each time
+const TICK = 4200           // ms between fade batches
+const FADE = 1200           // ms crossfade (matches the CSS whFadeIn)
+const BATCH_MIN = 3, BATCH_MAX = 5
 const key = (x) => x?.id ?? x?.image
 const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5)
 
@@ -17,15 +17,16 @@ function pickDistinct(pool, n) {
   return out
 }
 
-// Workforce hero — a RANDOM single photo (any row/column) flips at a time, then another.
-// A shuffled queue feeds the photos so every one cycles through fairly (no permanent faces).
+// Workforce hero — photos crossfade: a new photo eases IN over the old one (no blank).
+// A shuffled queue feeds the photos so every one cycles through fairly.
 export default function WorkforceGrid() {
   const initRef = useRef(null)
   if (!initRef.current) initRef.current = pickDistinct(WORKFORCE_PHOTOS, N)
-  const [cells, setCells] = useState(initRef.current)
-  const [flip, setFlip] = useState(Array(N).fill(false))
+  const [base, setBase] = useState(initRef.current)     // current photo per cell
+  const [top, setTop] = useState(Array(N).fill(null))   // incoming photo per cell (fading in)
+  const baseRef = useRef(initRef.current)
+  const topRef = useRef(Array(N).fill(null))
   const poolRef = useRef(WORKFORCE_PHOTOS)
-  const cellsRef = useRef(initRef.current)
   const queueRef = useRef([])
 
   useEffect(() => {
@@ -33,9 +34,10 @@ export default function WorkforceGrid() {
     const timeouts = []
     const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
-    // next photo from the shuffled queue that isn't already on screen
     const nextPhoto = () => {
-      const shown = new Set(cellsRef.current.filter(Boolean).map(key))
+      const shown = new Set()
+      baseRef.current.forEach((x) => x && shown.add(key(x)))
+      topRef.current.forEach((x) => x && shown.add(key(x)))
       for (let g = 0; g < poolRef.current.length + 2; g++) {
         if (!queueRef.current.length) queueRef.current = shuffle(poolRef.current)
         const cand = queueRef.current.shift()
@@ -46,25 +48,20 @@ export default function WorkforceGrid() {
 
     const tick = () => {
       if (poolRef.current.length < 2) return
-      const k = BATCH_MIN + Math.floor(Math.random() * (BATCH_MAX - BATCH_MIN + 1))   // 3..5 photos
-      const idxs = shuffle([...Array(N).keys()]).slice(0, k)                          // random cells (any row/col)
+      const k = BATCH_MIN + Math.floor(Math.random() * (BATCH_MAX - BATCH_MIN + 1))
+      const idxs = shuffle([...Array(N).keys()]).slice(0, k)
       const news = idxs.map(() => nextPhoto())
-      // if the pool has no fresh photo (all already on screen), shuffle these cells'
-      // own photos among themselves so it still moves — never duplicates a face
-      if (news.some((x) => !x)) {
-        const cur = shuffle(idxs.map((i) => cellsRef.current[i]))
+      if (news.some((x) => !x)) {                          // pool full -> shuffle these cells' own photos
+        const cur = shuffle(idxs.map((i) => baseRef.current[i]))
         for (let j = 0; j < idxs.length; j++) news[j] = cur[j]
       }
-      setFlip((f) => { const n = [...f]; idxs.forEach((i) => (n[i] = true)); return n })   // flip out together
+      // start crossfade: incoming photos fade in on top
+      setTop((t) => { const n = [...t]; idxs.forEach((i, j) => (n[i] = news[j])); topRef.current = n; return n })
       timeouts.push(setTimeout(() => {
-        setCells((prev) => {
-          const nc = [...prev]
-          idxs.forEach((i, j) => { if (news[j]) nc[i] = news[j] })
-          cellsRef.current = nc
-          return nc
-        })
-        setFlip((f) => { const n = [...f]; idxs.forEach((i) => (n[i] = false)); return n })  // flip back with new photos
-      }, HALF))
+        // promote: incoming becomes the base, clear the top layer (seamless)
+        setBase((b) => { const nb = [...b]; idxs.forEach((i, j) => { if (news[j]) nb[i] = news[j] }); baseRef.current = nb; return nb })
+        setTop((t) => { const n = [...t]; idxs.forEach((i) => (n[i] = null)); topRef.current = n; return n })
+      }, FADE))
     }
 
     const start = () => {
@@ -81,8 +78,8 @@ export default function WorkforceGrid() {
       const merged = [...WORKFORCE_PHOTOS, ...db.filter((x) => !seen.has(x.image))]
       poolRef.current = merged
       const startCells = pickDistinct(merged, N)
-      cellsRef.current = startCells
-      setCells(startCells)
+      baseRef.current = startCells
+      setBase(startCells)
       queueRef.current = shuffle(merged)
       start()
     })
@@ -92,19 +89,23 @@ export default function WorkforceGrid() {
 
   return (
     <div className="wh-grid">
-      {cells.map((w, i) => (
-        <figure className={`wh-card ${flip[i] ? 'flip' : ''}`} key={i}>
-          <div className="wh-img">
-            {w && <img src={imgWorker(w.image)} alt={w.name || ''} loading="lazy" />}
-          </div>
-          {w?.name && (
-            <figcaption className="wh-cap">
-              <span className="wh-name">{w.name}</span>
-              {w.role && <span className="wh-role">{w.role}</span>}
-            </figcaption>
-          )}
-        </figure>
-      ))}
+      {base.map((b, i) => {
+        const cur = top[i] || b
+        return (
+          <figure className="wh-card" key={i}>
+            <div className="wh-img">
+              {b && <img className="wh-base" src={imgWorker(b.image)} alt="" loading="lazy" />}
+              {top[i] && <img className="wh-top" key={top[i].image} src={imgWorker(top[i].image)} alt="" />}
+            </div>
+            {cur?.name && (
+              <figcaption className="wh-cap">
+                <span className="wh-name">{cur.name}</span>
+                {cur.role && <span className="wh-role">{cur.role}</span>}
+              </figcaption>
+            )}
+          </figure>
+        )
+      })}
     </div>
   )
 }
