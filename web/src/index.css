@@ -187,9 +187,9 @@ img { display: block; max-width: 100%; }
   grid-template-columns: repeat(5, 1fr);   /* 5 x 2 = 10 photos */
   grid-template-rows: repeat(2, 1fr);
   gap: 0;
-  height: min(46vh, 24vw);             /* landscape cells (3:2) matching the photos */
-  aspect-ratio: 15 / 4;                /* 5 cols x 2 rows of 3:2 cells */
-  width: auto;
+  width: min(880px, 92vw);             /* contained width (like before), centred */
+  aspect-ratio: 15 / 4;                /* 5 cols x 2 rows of 3:2 cells; height follows width */
+  height: auto;
   margin: 0 auto;
 }
 .wh-card { margin: 0; position: relative; overflow: hidden; perspective: 700px; }
@@ -221,8 +221,9 @@ img { display: block; max-width: 100%; }
   .wh-grid {
     grid-template-columns: repeat(2, 1fr);   /* 2 x 5 = 10 landscape cells */
     grid-template-rows: repeat(5, 1fr);
+    width: min(360px, 92vw);
     aspect-ratio: 3 / 5;
-    height: min(88vh, 146vw);
+    height: auto;
   }
 }
 .prow {
