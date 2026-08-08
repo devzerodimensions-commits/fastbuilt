@@ -18,25 +18,22 @@ for ext in ("*.jpg", "*.jpeg", "*.png", "*.JPG", "*.JPEG", "*.PNG"):
 files = sorted(set(files))
 
 def parse(fname):
+    # returns (name, role). Empty name = show the photo but NO name label.
     base = os.path.splitext(os.path.basename(fname))[0].strip()
     m = re.match(r"^\d+[_\s]+(.*)$", base)          # leading number like "01_" => has a name
     if m:
         rest = m.group(1).strip()
         parts = [p for p in re.split(r"[_\s]+", rest) if p]
         if not parts:
-            return None
+            return "", ""
         name = parts[0]
         role = " ".join(parts[1:]).strip() if len(parts) > 1 else "On-site Team"
         return name, role
-    return None                                     # no real name (DSC etc.) -> skip
+    return "", ""                                   # no name (DSC etc.) -> image shown, no label
 
 entries = []
 n = 0
 for f in files:
-    p = parse(f)
-    if not p:
-        print("  skip (no name):", os.path.basename(f))
-        continue
     try:
         im = Image.open(f)
         im = ImageOps.exif_transpose(im)            # honour camera rotation
@@ -45,9 +42,9 @@ for f in files:
         n += 1
         out_name = f"w{n:03d}.webp"
         im.save(os.path.join(OUT, out_name), "WEBP", quality=Q, method=6)
-        name, role = p
+        name, role = parse(f)
         entries.append({"name": name, "role": role, "image": f"/images/workforce/{out_name}"})
-        print(f"  {os.path.basename(f)} -> {out_name}  ({name} / {role})")
+        print(f"  {os.path.basename(f)} -> {out_name}  ({name or '(no name)'} / {role})")
     except Exception as e:
         print("  SKIP", f, e)
 

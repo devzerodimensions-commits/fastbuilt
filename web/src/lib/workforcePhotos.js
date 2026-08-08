@@ -74,5 +74,30 @@ export const WORKFORCE_PHOTOS = [
     "name": "Ripondas",
     "role": "Carpentar",
     "image": "/images/workforce/w015.webp"
+  },
+  {
+    "name": "",
+    "role": "",
+    "image": "/images/workforce/w016.webp"
+  },
+  {
+    "name": "",
+    "role": "",
+    "image": "/images/workforce/w017.webp"
+  },
+  {
+    "name": "",
+    "role": "",
+    "image": "/images/workforce/w018.webp"
+  },
+  {
+    "name": "",
+    "role": "",
+    "image": "/images/workforce/w019.webp"
+  },
+  {
+    "name": "",
+    "role": "",
+    "image": "/images/workforce/w020.webp"
   }
 ]

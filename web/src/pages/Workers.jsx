@@ -19,10 +19,12 @@ export default function Workers() {
             <div className="team-img">
               <img src={imgWorker(w.image)} alt={w.name} loading="lazy" />
             </div>
-            <figcaption className="team-cap">
-              <span className="tc-name">{w.name}</span>
-              <span className="tc-role">{w.role}</span>
-            </figcaption>
+            {w.name && (
+              <figcaption className="team-cap">
+                <span className="tc-name">{w.name}</span>
+                {w.role && <span className="tc-role">{w.role}</span>}
+              </figcaption>
+            )}
           </figure>
         ))}
       </div>
