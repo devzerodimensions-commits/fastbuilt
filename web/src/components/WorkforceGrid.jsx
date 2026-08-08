@@ -3,8 +3,7 @@ import { fetchWorkers, imgWorker } from '../lib/workers'
 import { WORKFORCE_PHOTOS } from '../lib/workforcePhotos'
 
 const N = 15                // visible cells (5x3 desktop / 3x5 mobile)
-const TICK = 5200           // ms between flip waves (slower)
-const STAGGER = 220         // ms delay between columns (left -> right wave)
+const TICK = 2600           // ms between flips (one random column each time)
 const HALF = 470            // ms half-flip (swap image at this point)
 const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5)
 const colsNow = () => (typeof window !== 'undefined' && window.innerWidth <= 760 ? 3 : 5)
@@ -32,9 +31,9 @@ export default function WorkforceGrid() {
     const timeouts = []
     const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
-    const nextSet = () => {
+    const nextN = (count) => {
       const out = []
-      for (let k = 0; k < N; k++) {
+      for (let k = 0; k < count; k++) {
         if (!queueRef.current.length) queueRef.current = shuffle(poolRef.current)
         out.push(queueRef.current.shift() || null)
       }
@@ -44,18 +43,15 @@ export default function WorkforceGrid() {
     const tick = () => {
       if (poolRef.current.length < 2) return
       const cols = colsNow()
-      const ns = nextSet()
-      for (let col = 0; col < cols; col++) {
-        const idxs = []
-        for (let i = col; i < N; i += cols) idxs.push(i)
-        timeouts.push(setTimeout(() => {
-          setFlip((f) => { const n = [...f]; idxs.forEach((i) => (n[i] = true)); return n })   // this column flips out
-          timeouts.push(setTimeout(() => {
-            setCells((prev) => { const nc = [...prev]; idxs.forEach((i) => (nc[i] = ns[i])); return nc })
-            setFlip((f) => { const n = [...f]; idxs.forEach((i) => (n[i] = false)); return n })  // flip back with new photos
-          }, HALF))
-        }, col * STAGGER))
-      }
+      const col = Math.floor(Math.random() * cols)      // a random column each time
+      const idxs = []
+      for (let i = col; i < N; i += cols) idxs.push(i)
+      const news = nextN(idxs.length)
+      setFlip((f) => { const n = [...f]; idxs.forEach((i) => (n[i] = true)); return n })   // flip this column out
+      timeouts.push(setTimeout(() => {
+        setCells((prev) => { const nc = [...prev]; idxs.forEach((i, k) => (nc[i] = news[k])); return nc })
+        setFlip((f) => { const n = [...f]; idxs.forEach((i) => (n[i] = false)); return n })  // flip back with new photos
+      }, HALF))
     }
 
     const start = () => {
