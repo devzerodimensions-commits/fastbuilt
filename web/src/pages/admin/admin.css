@@ -1,10 +1,10 @@
 /* ===================== ADMIN (WordPress-style) ===================== */
 :root {
-  --wp-side: #1d2327;
-  --wp-side-hover: #2c3338;
-  --wp-blue: #2271b1;
-  --wp-blue-d: #135e96;
-  --wp-gray: #f0f0f1;
+  --wp-side: #111111;
+  --wp-side-hover: #2a2a2a;
+  --wp-blue: #1d2327;      /* primary accent -> black (monochrome theme) */
+  --wp-blue-d: #000000;    /* hover -> pure black */
+  --wp-gray: #f2f2f2;
   --wp-line: #dcdcde;
   --wp-text: #1d2327;
 }
@@ -31,11 +31,11 @@
 .wp-menu { display: flex; flex-direction: column; margin-top: 6px; flex: 1; }
 .wp-menu button { display: flex; align-items: center; gap: 10px; background: transparent; border: none; color: #c3c4c7; padding: 12px 20px; font-size: 14px; cursor: pointer; text-align: left; border-left: 3px solid transparent; }
 .wp-menu button svg { opacity: .8; }
-.wp-menu button:hover { background: var(--wp-side-hover); color: #72aee6; }
-.wp-menu button.active { background: var(--wp-blue); color: #fff; border-left-color: #72aee6; }
+.wp-menu button:hover { background: var(--wp-side-hover); color: #fff; }
+.wp-menu button.active { background: #2a2a2a; color: #fff; border-left-color: #fff; font-weight: 600; }
 .wp-menu button.active svg { opacity: 1; }
 .wp-logout { margin: 16px 20px 20px; background: transparent; border: 1px solid #3c434a; color: #c3c4c7; padding: 9px; border-radius: 4px; cursor: pointer; font-size: 13px; }
-.wp-logout:hover { border-color: #72aee6; color: #fff; }
+.wp-logout:hover { border-color: #fff; color: #fff; }
 
 /* ---------- body ---------- */
 .wp-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }

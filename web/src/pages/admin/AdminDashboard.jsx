@@ -132,10 +132,10 @@ export default function AdminDashboard() {
 
 function Overview({ counts, go }) {
   const cards = [
-    { key: 'projects', label: 'Projects', icon: 'projects', color: '#2271b1' },
-    { key: 'workers', label: 'Workers', icon: 'workers', color: '#00a32a' },
-    { key: 'team', label: 'Team', icon: 'team', color: '#8c5e58' },
-    { key: 'categories', label: 'Categories', icon: 'categories', color: '#9a6700' },
+    { key: 'projects', label: 'Projects', icon: 'projects', color: '#1d2327' },
+    { key: 'workers', label: 'Workers', icon: 'workers', color: '#3c434a' },
+    { key: 'team', label: 'Team', icon: 'team', color: '#646970' },
+    { key: 'categories', label: 'Categories', icon: 'categories', color: '#8c8f94' },
   ]
   return (
     <>
