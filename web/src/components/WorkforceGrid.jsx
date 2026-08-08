@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { fetchWorkers, imgWorker, WORKERS } from '../lib/workers'
+import { fetchWorkers, imgWorker } from '../lib/workers'
+import { WORKFORCE_PHOTOS } from '../lib/workforcePhotos'
 
 const N = 6                 // visible cells (3x2 desktop / 2x3 mobile)
 const TICK = 1800           // ms between flips
@@ -19,10 +20,10 @@ function pickDistinct(pool, n) {
 // permanent. Renders instantly with bundled photos, then swaps to the live pool.
 export default function WorkforceGrid() {
   const initRef = useRef(null)
-  if (!initRef.current) initRef.current = pickDistinct(WORKERS, N)
+  if (!initRef.current) initRef.current = pickDistinct(WORKFORCE_PHOTOS, N)
   const [cells, setCells] = useState(initRef.current)
   const [flip, setFlip] = useState(Array(N).fill(false))
-  const poolRef = useRef(WORKERS)
+  const poolRef = useRef(WORKFORCE_PHOTOS)
   const cellsRef = useRef(initRef.current)
 
   useEffect(() => {
@@ -48,15 +49,16 @@ export default function WorkforceGrid() {
 
     if (!reduced && poolRef.current.length >= 2) timer = setInterval(tick, TICK)
 
-    // swap in the live pool once it loads (cold API can be slow — fallback shows meanwhile)
+    // merge in real dashboard-added workers (Cloudinary URLs) — skip legacy sample keys
     fetchWorkers().then((w) => {
-      if (w && w.length) {
-        poolRef.current = w
-        const start = pickDistinct(w, N)
-        cellsRef.current = start
-        setCells(start)
-        if (!timer && !reduced && w.length >= 2) timer = setInterval(tick, TICK)
-      }
+      const db = Array.isArray(w) ? w.filter((x) => x && x.image && /^https?:\/\//.test(x.image)) : []
+      const seen = new Set(WORKFORCE_PHOTOS.map((p) => p.image))
+      const merged = [...WORKFORCE_PHOTOS, ...db.filter((x) => !seen.has(x.image))]
+      poolRef.current = merged
+      const start = pickDistinct(merged, N)
+      cellsRef.current = start
+      setCells(start)
+      if (!timer && !reduced && merged.length >= 2) timer = setInterval(tick, TICK)
     })
 
     return () => clearInterval(timer)

@@ -2,6 +2,28 @@ import { useRef, useState } from 'react'
 import { uploadImage, cloudinaryConfigured } from '../../lib/api'
 import { imgColor } from '../../lib/projects'
 
+// Convert ANY chosen image to optimized WebP (resized) before uploading — so every
+// image stored is WebP, now and in the future.
+async function fileToWebp(file, maxDim = 1400, quality = 0.85) {
+  const dataUrl = await new Promise((res, rej) => {
+    const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file)
+  })
+  const img = await new Promise((res, rej) => {
+    const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = dataUrl
+  })
+  let { width, height } = img
+  if (Math.max(width, height) > maxDim) {
+    const s = maxDim / Math.max(width, height)
+    width = Math.round(width * s); height = Math.round(height * s)
+  }
+  const canvas = document.createElement('canvas')
+  canvas.width = width; canvas.height = height
+  canvas.getContext('2d').drawImage(img, 0, 0, width, height)
+  const blob = await new Promise((res) => canvas.toBlob(res, 'image/webp', quality))
+  if (!blob) throw new Error('WebP conversion not supported by this browser')
+  return new File([blob], (file.name.replace(/\.[^.]+$/, '') || 'image') + '.webp', { type: 'image/webp' })
+}
+
 // Image input: upload to Cloudinary (if configured) or paste a URL. Stores the final URL/key.
 export default function ImageField({ label, value, onChange }) {
   const fileRef = useRef(null)
@@ -13,7 +35,8 @@ export default function ImageField({ label, value, onChange }) {
     if (!file) return
     setErr(''); setBusy(true)
     try {
-      const url = await uploadImage(file)
+      const webp = await fileToWebp(file)      // always upload as WebP
+      const url = await uploadImage(webp)
       onChange(url)
     } catch (ex) {
       setErr(ex.message)
