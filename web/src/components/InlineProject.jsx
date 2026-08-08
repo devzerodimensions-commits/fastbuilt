@@ -155,3 +155,4 @@ export default function InlineProject({ project: p, flipFrom, onClose }) {
     </div>
   )
 }
+
