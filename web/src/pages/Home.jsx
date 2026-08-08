@@ -5,19 +5,16 @@ import CategoryIcon from '../components/CategoryIcon'
 import InlineProject from '../components/InlineProject'
 import useHomeMotion from '../lib/useHomeMotion'
 import { fetchProjects, imgColor, imgLQIP } from '../lib/projects'
-import { fetchWorkers, imgWorker } from '../lib/workers'
+import WorkforceGrid from '../components/WorkforceGrid'
 
 export default function Home() {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [openSlug, setOpenSlug] = useState(null)
   const [flipFrom, setFlipFrom] = useState(null)   // clicked thumbnail's rect (for the FLIP grow)
-  const [workers, setWorkers] = useState([])
   const [params] = useSearchParams()
   const active = params.get('cat') || 'All'
   const scaleRef = useRef(null)
-
-  useEffect(() => { fetchWorkers().then(setWorkers) }, [])
 
   useEffect(() => {
     fetchProjects().then((p) => {
@@ -80,21 +77,9 @@ export default function Home() {
         <div className="page-scale" ref={scaleRef}>
         {/* one scroll-scale group so workers + projects breathe together on scroll */}
         <div className="scroll-area">
-        {/* WORKERS — zoomed-in hero grid (no side heading); projects sit below the fold */}
+        {/* WORKERS — zoomed-in hero; cells randomly flip through the whole photo pool */}
         <section className="workers-home">
-          <div className="wh-grid">
-            {workers.map((w, i) => (
-              <figure className="wh-card" key={w.id ?? i}>
-                <div className="wh-img">
-                  <img src={imgWorker(w.image)} alt={w.name} loading="lazy" />
-                </div>
-                <figcaption className="wh-cap">
-                  <span className="wh-name">{w.name}</span>
-                  <span className="wh-role">{w.role}</span>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
+          <WorkforceGrid />
         </section>
 
         <div className="projects">

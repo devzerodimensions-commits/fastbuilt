@@ -29,3 +29,8 @@ _*/
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Client photo dumps — never commit (upload to Cloudinary instead)
+Example photos for the website/
+Example photos for the website.zip
+*.zip
