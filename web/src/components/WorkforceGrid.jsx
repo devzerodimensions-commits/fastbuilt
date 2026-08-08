@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { fetchWorkers, imgWorker } from '../lib/workers'
 import { WORKFORCE_PHOTOS } from '../lib/workforcePhotos'
 
-const N = 15                // visible cells (5x3 desktop / 3x5 mobile)
+const N = 9                 // visible cells (3x3)
 const TICK = 3600           // ms between full crossfades
 const FADE = 1200           // ms crossfade (matches the CSS whFadeIn)
 const key = (x) => x?.id ?? x?.image
