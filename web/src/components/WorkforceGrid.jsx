@@ -3,10 +3,10 @@ import { fetchWorkers, imgWorker } from '../lib/workers'
 import { WORKFORCE_PHOTOS } from '../lib/workforcePhotos'
 
 const N = 15                // visible cells (5x3 desktop / 3x5 mobile)
-const TICK = 2600           // ms between flips (one random column each time)
+const TICK = 1300           // ms between flips (one random photo each time)
 const HALF = 470            // ms half-flip (swap image at this point)
+const key = (x) => x?.id ?? x?.image
 const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5)
-const colsNow = () => (typeof window !== 'undefined' && window.innerWidth <= 760 ? 3 : 5)
 
 function pickDistinct(pool, n) {
   if (!pool || !pool.length) return Array(n).fill(null)
@@ -16,14 +16,15 @@ function pickDistinct(pool, n) {
   return out
 }
 
-// Workforce hero — flips COLUMN BY COLUMN (left to right wave); a shuffled queue feeds
-// the sets so every photo cycles through fairly.
+// Workforce hero — a RANDOM single photo (any row/column) flips at a time, then another.
+// A shuffled queue feeds the photos so every one cycles through fairly (no permanent faces).
 export default function WorkforceGrid() {
   const initRef = useRef(null)
   if (!initRef.current) initRef.current = pickDistinct(WORKFORCE_PHOTOS, N)
   const [cells, setCells] = useState(initRef.current)
   const [flip, setFlip] = useState(Array(N).fill(false))
   const poolRef = useRef(WORKFORCE_PHOTOS)
+  const cellsRef = useRef(initRef.current)
   const queueRef = useRef([])
 
   useEffect(() => {
@@ -31,26 +32,26 @@ export default function WorkforceGrid() {
     const timeouts = []
     const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
-    const nextN = (count) => {
-      const out = []
-      for (let k = 0; k < count; k++) {
+    // next photo from the shuffled queue that isn't already on screen
+    const nextPhoto = () => {
+      const shown = new Set(cellsRef.current.filter(Boolean).map(key))
+      for (let g = 0; g < poolRef.current.length + 2; g++) {
         if (!queueRef.current.length) queueRef.current = shuffle(poolRef.current)
-        out.push(queueRef.current.shift() || null)
+        const cand = queueRef.current.shift()
+        if (cand && !shown.has(key(cand))) return cand
       }
-      return out
+      return null
     }
 
     const tick = () => {
       if (poolRef.current.length < 2) return
-      const cols = colsNow()
-      const col = Math.floor(Math.random() * cols)      // a random column each time
-      const idxs = []
-      for (let i = col; i < N; i += cols) idxs.push(i)
-      const news = nextN(idxs.length)
-      setFlip((f) => { const n = [...f]; idxs.forEach((i) => (n[i] = true)); return n })   // flip this column out
+      const i = Math.floor(Math.random() * N)          // a random cell (any row/column)
+      const next = nextPhoto()
+      if (!next) return
+      setFlip((f) => { const n = [...f]; n[i] = true; return n })       // flip out
       timeouts.push(setTimeout(() => {
-        setCells((prev) => { const nc = [...prev]; idxs.forEach((i, k) => (nc[i] = news[k])); return nc })
-        setFlip((f) => { const n = [...f]; idxs.forEach((i) => (n[i] = false)); return n })  // flip back with new photos
+        setCells((prev) => { const nc = [...prev]; nc[i] = next; cellsRef.current = nc; return nc })
+        setFlip((f) => { const n = [...f]; n[i] = false; return n })    // flip back with new photo
       }, HALF))
     }
 
@@ -68,6 +69,7 @@ export default function WorkforceGrid() {
       const merged = [...WORKFORCE_PHOTOS, ...db.filter((x) => !seen.has(x.image))]
       poolRef.current = merged
       const startCells = pickDistinct(merged, N)
+      cellsRef.current = startCells
       setCells(startCells)
       queueRef.current = shuffle(merged)
       start()
