@@ -187,8 +187,8 @@ img { display: block; max-width: 100%; }
   grid-template-columns: repeat(3, 1fr);   /* 3 x 3 = 9 photos */
   grid-template-rows: repeat(3, 1fr);
   gap: 0;
-  width: min(880px, 92vw);             /* same container width & height as before */
-  aspect-ratio: 5 / 2;
+  width: min(880px, 92vw);             /* same width; height grows so cells are 3:2 (full photo, no crop) */
+  aspect-ratio: 3 / 2;
   height: auto;
   margin: 0 auto;
 }
