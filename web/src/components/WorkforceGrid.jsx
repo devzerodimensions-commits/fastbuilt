@@ -4,7 +4,7 @@ import { WORKFORCE_PHOTOS } from '../lib/workforcePhotos'
 
 const N = 15                // visible cells (5x3 desktop / 3x5 mobile)
 const TICK = 2100           // ms between flip batches
-const HALF = 470            // ms half-flip (swap image at this point)
+const HALF = 520            // ms — swap image after it has faded out
 const BATCH_MIN = 3, BATCH_MAX = 5   // how many random photos flip together each time
 const key = (x) => x?.id ?? x?.image
 const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5)
