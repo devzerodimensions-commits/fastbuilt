@@ -3,8 +3,8 @@ import { fetchWorkers, imgWorker } from '../lib/workers'
 import { WORKFORCE_PHOTOS } from '../lib/workforcePhotos'
 
 const N = 15                // visible cells (5x3 desktop / 3x5 mobile)
-const TICK = 2100           // ms between flip batches
-const HALF = 520            // ms — swap image after it has faded out
+const TICK = 4200           // ms between fade batches (relaxed pace)
+const HALF = 1200           // ms — swap image after it has fully faded out (matches the 1.2s fade)
 const BATCH_MIN = 3, BATCH_MAX = 5   // how many random photos flip together each time
 const key = (x) => x?.id ?? x?.image
 const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5)
