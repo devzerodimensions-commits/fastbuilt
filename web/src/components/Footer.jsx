@@ -1,46 +1,48 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { CATEGORIES } from '../lib/projects'
-import { CONTACT } from './Header'
-
-const SECTIONS = [
-  {
-    title: 'Office',
-    render: () => (
-      <>
-        <p>Fastbuilt Enterprise</p>
-        <p>{CONTACT.address}</p>
-      </>
-    ),
-  },
-  {
-    title: 'Contact',
-    render: () => (
-      <>
-        <a href={`tel:${CONTACT.phone}`}>{CONTACT.phone}</a>
-        <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
-      </>
-    ),
-  },
-  {
-    title: 'Capabilities',
-    render: () => (
-      <>
-        {CATEGORIES.map((c) => (
-          <Link key={c} to={`/?cat=${encodeURIComponent(c)}`}>{c}</Link>
-        ))}
-      </>
-    ),
-  },
-  {
-    title: 'Follow',
-    render: () => (
-      <a href={CONTACT.linkedin} target="_blank" rel="noreferrer">LinkedIn</a>
-    ),
-  },
-]
+import { useSettings } from '../lib/settings'
 
 export default function Footer() {
+  const s = useSettings()
+  const SECTIONS = [
+    {
+      title: 'Office',
+      render: () => (
+        <>
+          <p>{s.site_title || 'Fastbuilt'} Enterprise</p>
+          <p>{s.contact_address}</p>
+        </>
+      ),
+    },
+    {
+      title: 'Contact',
+      render: () => (
+        <>
+          {s.contact_phone && <a href={`tel:${s.contact_phone}`}>{s.contact_phone}</a>}
+          {s.contact_email && <a href={`mailto:${s.contact_email}`}>{s.contact_email}</a>}
+        </>
+      ),
+    },
+    {
+      title: 'Capabilities',
+      render: () => (
+        <>
+          {CATEGORIES.map((c) => (
+            <Link key={c} to={`/?cat=${encodeURIComponent(c)}`}>{c}</Link>
+          ))}
+        </>
+      ),
+    },
+    {
+      title: 'Follow',
+      render: () =>
+        s.contact_linkedin ? (
+          <a href={s.contact_linkedin} target="_blank" rel="noreferrer">LinkedIn</a>
+        ) : null,
+    },
+  ]
+
   const [open, setOpen] = useState(() => new Set())
 
   const toggle = (i) =>
@@ -74,7 +76,7 @@ export default function Footer() {
       </div>
 
       <div className="fbottom">
-        <span>© {new Date().getFullYear()} Fastbuilt Enterprise</span>
+        <span>© {new Date().getFullYear()} {s.site_title || 'Fastbuilt'} Enterprise</span>
         <button
           className="back-to-top"
           onClick={() => {

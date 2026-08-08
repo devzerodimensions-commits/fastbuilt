@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import crypto from 'node:crypto'
 import { pool } from '../db.js'
-import { signToken } from '../middleware/auth.js'
+import { signToken, requireAuth } from '../middleware/auth.js'
 import { hashPassword, verifyPassword, sha256 } from '../auth/password.js'
 import { sendResetEmail, mailerReady } from '../auth/mailer.js'
 
@@ -28,23 +28,41 @@ router.post('/login', async (req, res) => {
     const { rows } = await pool.query('SELECT * FROM admins WHERE lower(username)=lower($1) LIMIT 1', [username])
     const row = rows[0]
     if (row) {
-      if (verifyPassword(password, row.password_hash))
-        return res.json({ token: signToken({ user: row.username }), user: row.username })
+      if (verifyPassword(password, row.password_hash)) {
+        const role = row.role || 'administrator'
+        return res.json({ token: signToken({ user: row.username, role }), user: row.username, role })
+      }
       return res.status(401).json({ error: 'Invalid username or password' })
     }
   } catch {
     // admins table may not exist yet on a fresh DB — fall through to env credentials
   }
   if (username === ADMIN_USER && password === ADMIN_PASS)
-    return res.json({ token: signToken({ user: username }), user: username })
+    return res.json({ token: signToken({ user: username, role: 'administrator' }), user: username, role: 'administrator' })
   return res.status(401).json({ error: 'Invalid username or password' })
 })
 
-// GET /api/auth/me — quick token check (used by the dashboard on load)
-router.get('/me', (req, res) => {
-  const header = req.headers.authorization || ''
-  if (!header.startsWith('Bearer ')) return res.status(401).json({ error: 'unauthorized' })
-  res.json({ ok: true })
+// GET /api/auth/me — who am I (used by the dashboard on load)
+router.get('/me', requireAuth, (req, res) =>
+  res.json({ ok: true, user: req.admin.user, role: req.admin.role || 'administrator' }))
+
+// POST /api/auth/change-password — logged-in user changes their own password
+router.post('/change-password', requireAuth, async (req, res) => {
+  const { currentPassword, newPassword } = req.body || {}
+  if (!newPassword || String(newPassword).length < 6)
+    return res.status(400).json({ error: 'New password must be at least 6 characters' })
+  try {
+    const { rows } = await pool.query('SELECT * FROM admins WHERE lower(username)=lower($1) LIMIT 1', [req.admin.user])
+    const row = rows[0]
+    if (!row) return res.status(400).json({ error: 'Account not found' })
+    if (!verifyPassword(currentPassword || '', row.password_hash))
+      return res.status(400).json({ error: 'Current password is incorrect' })
+    await pool.query('UPDATE admins SET password_hash=$1 WHERE id=$2', [hashPassword(newPassword), row.id])
+    return res.json({ ok: true })
+  } catch (e) {
+    console.error('[change-password]', e.message)
+    return res.status(500).json({ error: 'Could not change password' })
+  }
 })
 
 // GET /api/auth/config — tells the frontend whether email-based reset is available

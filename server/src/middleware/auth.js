@@ -18,3 +18,12 @@ export function requireAuth(req, res, next) {
     return res.status(401).json({ error: 'invalid token' })
   }
 }
+
+// Require an administrator (user management + settings). Tokens issued before roles
+// existed, and env-fallback logins, have no role → treated as administrator.
+export function requireAdmin(req, res, next) {
+  requireAuth(req, res, () => {
+    if (!req.admin.role || req.admin.role === 'administrator') return next()
+    return res.status(403).json({ error: 'Administrators only' })
+  })
+}

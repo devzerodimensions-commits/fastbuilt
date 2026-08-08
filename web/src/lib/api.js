@@ -42,8 +42,17 @@ export const resetPassword = (token, password) =>
   request('/api/auth/reset', { method: 'POST', body: { token, password } })
 export const authConfig = () => request('/api/auth/config')
 
-// ---- generic CRUD for a resource (projects / workers / team) ----
-export const listItems = (resource) => request(`/api/${resource}`)
+// current user + self password change
+export const fetchMe = () => request('/api/auth/me', { auth: true })
+export const changePassword = (currentPassword, newPassword) =>
+  request('/api/auth/change-password', { method: 'POST', body: { currentPassword, newPassword }, auth: true })
+
+// site settings
+export const getSettings = () => request('/api/settings')
+export const saveSettings = (body) => request('/api/settings', { method: 'PUT', body, auth: true })
+
+// ---- generic CRUD for a resource (projects / workers / team / users) ----
+export const listItems = (resource, auth = false) => request(`/api/${resource}`, { auth })
 export const createItem = (resource, body) => request(`/api/${resource}`, { method: 'POST', body, auth: true })
 export const updateItem = (resource, id, body) => request(`/api/${resource}/${id}`, { method: 'PUT', body, auth: true })
 export const deleteItem = (resource, id) => request(`/api/${resource}/${id}`, { method: 'DELETE', auth: true })

@@ -50,7 +50,17 @@ CREATE TABLE IF NOT EXISTS admins (
   username      TEXT UNIQUE NOT NULL,
   email         TEXT,
   password_hash TEXT NOT NULL,
+  role          TEXT DEFAULT 'administrator',
+  name          TEXT,
   reset_token   TEXT,
   reset_expires TIMESTAMPTZ,
   created_at    TIMESTAMPTZ DEFAULT now()
+);
+ALTER TABLE admins ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'administrator';
+ALTER TABLE admins ADD COLUMN IF NOT EXISTS name TEXT;
+
+-- key/value site settings managed from the dashboard Settings page
+CREATE TABLE IF NOT EXISTS settings (
+  key   TEXT PRIMARY KEY,
+  value TEXT
 );

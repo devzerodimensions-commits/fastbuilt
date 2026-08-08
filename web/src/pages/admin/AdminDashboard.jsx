@@ -1,6 +1,9 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { listItems, createItem, updateItem, deleteItem, clearToken, isLoggedIn } from '../../lib/api'
+import {
+  listItems, createItem, updateItem, deleteItem, clearToken, isLoggedIn,
+  fetchMe, getSettings, saveSettings, changePassword,
+} from '../../lib/api'
 import { CATEGORIES } from '../../lib/projects'
 import ImageField from './ImageField'
 import './admin.css'
@@ -52,6 +55,17 @@ const RESOURCES = {
       { key: 'sort_order', label: 'Sort order', type: 'number' },
     ],
   },
+  users: {
+    label: 'Users', single: 'User', authList: true, resource: 'users',
+    columns: ['username', 'email', 'role'],
+    fields: [
+      { key: 'username', label: 'Username', required: true, lockOnEdit: true },
+      { key: 'name', label: 'Display name' },
+      { key: 'email', label: 'Email', type: 'email' },
+      { key: 'role', label: 'Role', type: 'select', options: ['administrator', 'editor'], required: true },
+      { key: 'password', label: 'Password', type: 'password', required: true },
+    ],
+  },
 }
 
 const ICONS = {
@@ -60,6 +74,8 @@ const ICONS = {
   workers: <path d="M12 12a4 4 0 100-8 4 4 0 000 8zm0 2c-4 0-8 2-8 5v1h16v-1c0-3-4-5-8-5z" />,
   team: <path d="M8 11a3 3 0 100-6 3 3 0 000 6zm8 0a3 3 0 100-6 3 3 0 000 6zM2 19c0-2.5 3-4 6-4s6 1.5 6 4v1H2v-1zm12.5-3.9c2.3.4 4.5 1.7 4.5 3.9v1h3v-1c0-2.3-3.2-3.6-6-3.9z" />,
   categories: <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z" />,
+  users: <path d="M8 11a3 3 0 100-6 3 3 0 000 6zm8 0a3 3 0 100-6 3 3 0 000 6zM2 19c0-2.5 3-4 6-4s6 1.5 6 4v1H2v-1zm12.5-3.9c2.3.4 4.5 1.7 4.5 3.9v1h3v-1c0-2.3-3.2-3.6-6-3.9z" />,
+  settings: <path d="M12 8a4 4 0 100 8 4 4 0 000-8zm8.94 4a7 7 0 00-.15-1.4l2.02-1.58-2-3.46-2.39.96a7 7 0 00-2.42-1.4L15.6 2h-4l-.4 2.72a7 7 0 00-2.42 1.4l-2.39-.96-2 3.46 2.02 1.58a7 7 0 000 2.8L2 14.58l2 3.46 2.39-.96a7 7 0 002.42 1.4L11.6 22h4l.4-2.72a7 7 0 002.42-1.4l2.39.96 2-3.46-2.02-1.58c.1-.46.15-.93.15-1.4z" />,
 }
 const Icon = ({ name }) => (
   <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">{ICONS[name]}</svg>
@@ -71,14 +87,20 @@ export default function AdminDashboard() {
   const [counts, setCounts] = useState(null)
   const [catOptions, setCatOptions] = useState([])
   const [msg, setMsg] = useState('')
+  const [me, setMe] = useState(null)
 
   useEffect(() => { if (!isLoggedIn()) nav('/admin/login') }, [nav])
+  useEffect(() => { fetchMe().then(setMe).catch(() => setMe({ user: 'admin', role: 'administrator' })) }, [])
+
+  const isAdmin = !me || me.role === 'administrator'
 
   const loadCounts = useCallback(async () => {
     try {
       const [p, w, t, c] = await Promise.all([listItems('projects'), listItems('workers'), listItems('team'), listItems('categories')])
-      setCounts({ projects: p.length, workers: w.length, team: t.length, categories: c.length })
+      const next = { projects: p.length, workers: w.length, team: t.length, categories: c.length }
       setCatOptions(c.map((x) => x.name))
+      try { const u = await listItems('users', true); next.users = u.length } catch { /* non-admin */ }
+      setCounts(next)
     } catch { setCounts({ projects: 0, workers: 0, team: 0, categories: 0 }) }
   }, [])
 
@@ -93,7 +115,13 @@ export default function AdminDashboard() {
     { key: 'workers', label: 'Workers', icon: 'workers' },
     { key: 'team', label: 'Team', icon: 'team' },
     { key: 'categories', label: 'Categories', icon: 'categories' },
+    ...(isAdmin ? [
+      { key: 'users', label: 'Users', icon: 'users' },
+      { key: 'settings', label: 'Settings', icon: 'settings' },
+    ] : []),
   ]
+
+  const crumb = view === 'dashboard' ? 'Dashboard' : view === 'settings' ? 'Settings' : RESOURCES[view].label
 
   return (
     <div className="wp">
@@ -111,17 +139,19 @@ export default function AdminDashboard() {
 
       <div className="wp-body">
         <header className="wp-topbar">
-          <div className="wp-crumb">{view === 'dashboard' ? 'Dashboard' : RESOURCES[view].label}</div>
+          <div className="wp-crumb">{crumb}</div>
           <div className="wp-top-right">
             <a href="/" target="_blank" rel="noreferrer" className="wp-visit">↗ Visit site</a>
-            <span className="wp-user">👤 admin</span>
+            <span className="wp-user">👤 {me?.user || 'admin'}{me?.role ? ` · ${me.role}` : ''}</span>
           </div>
         </header>
 
         <main className="wp-main">
-          {view === 'dashboard'
-            ? <Overview counts={counts} go={setView} />
-            : <ResourceManager key={view} resource={view} cfg={RESOURCES[view]} onChanged={loadCounts} flash={flash} categoryOptions={catOptions} />}
+          {view === 'dashboard' && <Overview counts={counts} go={setView} isAdmin={isAdmin} />}
+          {view === 'settings' && <SettingsManager flash={flash} />}
+          {view !== 'dashboard' && view !== 'settings' && (
+            <ResourceManager key={view} resource={RESOURCES[view].resource || view} cfg={RESOURCES[view]} onChanged={loadCounts} flash={flash} categoryOptions={catOptions} />
+          )}
         </main>
       </div>
 
@@ -130,12 +160,13 @@ export default function AdminDashboard() {
   )
 }
 
-function Overview({ counts, go }) {
+function Overview({ counts, go, isAdmin }) {
   const cards = [
     { key: 'projects', label: 'Projects', icon: 'projects', color: '#1d2327' },
     { key: 'workers', label: 'Workers', icon: 'workers', color: '#3c434a' },
     { key: 'team', label: 'Team', icon: 'team', color: '#646970' },
     { key: 'categories', label: 'Categories', icon: 'categories', color: '#8c8f94' },
+    ...(isAdmin ? [{ key: 'users', label: 'Users', icon: 'users', color: '#1d2327' }] : []),
   ]
   return (
     <>
@@ -162,15 +193,16 @@ function ResourceManager({ resource, cfg, onChanged, flash, categoryOptions }) {
 
   const load = useCallback(async () => {
     setLoading(true)
-    try { setItems(await listItems(resource)) }
+    try { setItems(await listItems(resource, cfg.authList)) }
     catch (e) { flash(e.message) }
     finally { setLoading(false) }
-  }, [resource, flash])
+  }, [resource, cfg.authList, flash])
 
   useEffect(() => { load() }, [load])
 
   const onDelete = async (item) => {
-    if (!confirm(`Delete "${item.name}"? This cannot be undone.`)) return
+    const label = item.name || item.username || item.email || 'this item'
+    if (!confirm(`Delete "${label}"? This cannot be undone.`)) return
     try { await deleteItem(resource, item.id); await load(); onChanged(); flash('Deleted') }
     catch (e) { flash(e.message) }
   }
@@ -253,13 +285,27 @@ function ItemForm({ cfg, initial, onCancel, onSave, categoryOptions }) {
                   {optionsFor(f).map((o) => <option key={o} value={o}>{o}</option>)}
                 </select>
               </>
-            ) : (
-              <>
-                <label>{f.label}{f.required && ' *'}</label>
-                <input type={f.type === 'number' ? 'number' : 'text'} value={form[f.key] ?? ''}
-                  onChange={(e) => set(f.key, f.type === 'number' ? Number(e.target.value) : e.target.value)} required={f.required} />
-              </>
-            )}
+            ) : (() => {
+              const isEdit = !!initial.id
+              const inputType = f.type === 'number' ? 'number' : f.type === 'email' ? 'email' : f.type === 'password' ? 'password' : 'text'
+              const locked = f.lockOnEdit && isEdit
+              // password is required on create, optional on edit (blank = keep current)
+              const required = f.required && !(f.type === 'password' && isEdit) && !locked
+              return (
+                <>
+                  <label>{f.label}{required && ' *'}</label>
+                  <input
+                    type={inputType}
+                    value={form[f.key] ?? ''}
+                    disabled={locked}
+                    placeholder={f.type === 'password' && isEdit ? 'Leave blank to keep current' : ''}
+                    autoComplete={f.type === 'password' ? 'new-password' : 'off'}
+                    onChange={(e) => set(f.key, f.type === 'number' ? Number(e.target.value) : e.target.value)}
+                    required={required}
+                  />
+                </>
+              )
+            })()}
           </div>
         ))}
         <div className="af-buttons">
@@ -268,5 +314,80 @@ function ItemForm({ cfg, initial, onCancel, onSave, categoryOptions }) {
         </div>
       </form>
     </div>
+  )
+}
+
+const GENERAL_FIELDS = [
+  { key: 'site_title', label: 'Site title' },
+  { key: 'tagline', label: 'Tagline' },
+  { key: 'contact_phone', label: 'Contact phone' },
+  { key: 'contact_email', label: 'Contact email' },
+  { key: 'contact_address', label: 'Address' },
+  { key: 'contact_linkedin', label: 'LinkedIn URL' },
+]
+
+function SettingsManager({ flash }) {
+  const [tab, setTab] = useState('general')
+  const [s, setS] = useState(null)
+  const [busy, setBusy] = useState(false)
+  const [cur, setCur] = useState(''); const [np, setNp] = useState(''); const [np2, setNp2] = useState('')
+
+  useEffect(() => { getSettings().then(setS).catch(() => setS({})) }, [])
+  const set = (k, v) => setS((p) => ({ ...p, [k]: v }))
+
+  const saveGeneral = async (e) => {
+    e.preventDefault(); setBusy(true)
+    try { await saveSettings(s); flash('Settings saved — live on the site') }
+    catch (ex) { flash(ex.message) } finally { setBusy(false) }
+  }
+  const savePw = async (e) => {
+    e.preventDefault()
+    if (np.length < 6) return flash('New password must be at least 6 characters')
+    if (np !== np2) return flash('New passwords do not match')
+    setBusy(true)
+    try { await changePassword(cur, np); setCur(''); setNp(''); setNp2(''); flash('Password changed') }
+    catch (ex) { flash(ex.message) } finally { setBusy(false) }
+  }
+
+  if (!s) return <div className="wp-loading">Loading…</div>
+
+  return (
+    <>
+      <h1 className="wp-h1">Settings</h1>
+      <div className="wp-tabs">
+        <button className={tab === 'general' ? 'active' : ''} onClick={() => setTab('general')}>General</button>
+        <button className={tab === 'account' ? 'active' : ''} onClick={() => setTab('account')}>Account</button>
+      </div>
+
+      {tab === 'general' ? (
+        <form className="wp-settings" onSubmit={saveGeneral}>
+          <p className="wp-sub">These appear in the site header, footer and contact links.</p>
+          {GENERAL_FIELDS.map((f) => (
+            <div className="af-row" key={f.key}>
+              <label>{f.label}</label>
+              <input value={s[f.key] || ''} onChange={(e) => set(f.key, e.target.value)} />
+            </div>
+          ))}
+          <button type="submit" className="wp-btn" disabled={busy}>{busy ? 'Saving…' : 'Save changes'}</button>
+        </form>
+      ) : (
+        <form className="wp-settings" onSubmit={savePw}>
+          <p className="wp-sub">Change your own login password.</p>
+          <div className="af-row">
+            <label>Current password</label>
+            <input type="password" value={cur} onChange={(e) => setCur(e.target.value)} autoComplete="current-password" />
+          </div>
+          <div className="af-row">
+            <label>New password</label>
+            <input type="password" value={np} onChange={(e) => setNp(e.target.value)} autoComplete="new-password" />
+          </div>
+          <div className="af-row">
+            <label>Confirm new password</label>
+            <input type="password" value={np2} onChange={(e) => setNp2(e.target.value)} autoComplete="new-password" />
+          </div>
+          <button type="submit" className="wp-btn" disabled={busy}>{busy ? 'Saving…' : 'Change password'}</button>
+        </form>
+      )}
+    </>
   )
 }

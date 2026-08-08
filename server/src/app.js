@@ -5,6 +5,8 @@ import projectsRouter from './routes/projects.js'
 import authRouter from './routes/auth.js'
 import peopleCrud from './routes/peopleCrud.js'
 import categoriesRouter from './routes/categories.js'
+import usersRouter from './routes/users.js'
+import settingsRouter from './routes/settings.js'
 import { ensureAdminTable } from './bootstrap.js'
 
 dotenv.config()
@@ -19,6 +21,8 @@ app.use('/api/projects', projectsRouter)
 app.use('/api/workers', peopleCrud('workers'))
 app.use('/api/team', peopleCrud('team'))
 app.use('/api/categories', categoriesRouter)
+app.use('/api/users', usersRouter)
+app.use('/api/settings', settingsRouter)
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, _req, res, _next) => {
