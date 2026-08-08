@@ -44,9 +44,12 @@ export default function InlineProject({ project: p, flipFrom, onClose }) {
     const BASE_W = 800, BASE_H = 480
     const scale = Math.min(1, (maxHalf * 2) / BASE_W, el.clientHeight / BASE_H)
     const w = BASE_W * scale, h = BASE_H * scale
-    img.style.width = w + 'px'
-    img.style.height = h + 'px'
-    img.style.objectFit = 'cover'
+    // give EVERY image in the open view the SAME size (1st, 2nd and any future images)
+    el.querySelectorAll('.ph-hero img').forEach((im) => {
+      im.style.width = w + 'px'
+      im.style.height = h + 'px'
+      im.style.objectFit = 'cover'
+    })
     const imgLeft = absLeft(img) - absLeft(col)              // image left within the column (margin still 0)
     heroPanel.style.marginLeft = Math.max(0, pageCentre - w / 2 - imgLeft) + 'px'
   }
