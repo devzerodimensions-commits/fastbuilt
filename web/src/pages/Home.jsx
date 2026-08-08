@@ -79,10 +79,12 @@ export default function Home() {
         <div className="page-scale" ref={scaleRef}>
         {/* one scroll-scale group so workers + projects breathe together on scroll */}
         <div className="scroll-area">
-        {/* WORKERS — zoomed-in hero; cells randomly flip through the whole photo pool */}
-        <section className="workers-home">
-          <WorkforceGrid />
-        </section>
+        {/* WORKERS hero — only on the plain home page (hidden when a category filter is active) */}
+        {active === 'All' && (
+          <section className="workers-home">
+            <WorkforceGrid />
+          </section>
+        )}
 
         <div className="projects">
           {filtered.map((p, i) => {
