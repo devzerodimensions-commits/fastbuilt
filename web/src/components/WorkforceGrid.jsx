@@ -95,8 +95,14 @@ export default function WorkforceGrid() {
       {cells.map((w, i) => (
         <figure className={`wh-card ${flip[i] ? 'flip' : ''}`} key={i}>
           <div className="wh-img">
-            {w && <img src={imgWorker(w.image)} alt="" loading="lazy" />}
+            {w && <img src={imgWorker(w.image)} alt={w.name || ''} loading="lazy" />}
           </div>
+          {w?.name && (
+            <figcaption className="wh-cap">
+              <span className="wh-name">{w.name}</span>
+              {w.role && <span className="wh-role">{w.role}</span>}
+            </figcaption>
+          )}
         </figure>
       ))}
     </div>
