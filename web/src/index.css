@@ -180,17 +180,15 @@ img { display: block; max-width: 100%; }
 /* Zoomed-in workforce that fills the first screen (no side heading);
    the projects sit below the fold and appear on scroll. */
 .workers-home {
-  min-height: 100vh;                    /* fills the first screen so projects sit below the fold */
-  display: flex; align-items: center; justify-content: center;
-  padding: 62px var(--pad) 40px;
+  padding: calc(62px + 44px) var(--pad) 44px;   /* compact hero band — no empty gap around the photos */
 }
 .wh-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);   /* 5 x 2 = 10 photos */
   grid-template-rows: repeat(2, 1fr);
   gap: 0;
-  height: min(66vh, 55vw);             /* big zoomed-in hero, always fits the viewport */
-  aspect-ratio: 16 / 10;
+  height: min(46vh, 24vw);             /* landscape cells (3:2) matching the photos */
+  aspect-ratio: 15 / 4;                /* 5 cols x 2 rows of 3:2 cells */
   width: auto;
   margin: 0 auto;
 }
@@ -198,11 +196,11 @@ img { display: block; max-width: 100%; }
 .wh-img { width: 100%; height: 100%; overflow: hidden; background: #e9e9e9; transition: transform .34s ease; transform-style: preserve-3d; backface-visibility: hidden; }
 .wh-card.flip .wh-img { transform: rotateY(90deg); }   /* random flip-through of the photo pool */
 .wh-img img {
-  width: 100%; height: 100%; object-fit: contain; display: block;   /* show the WHOLE photo — never crop */
+  width: 100%; height: 100%; object-fit: cover; object-position: center; display: block;  /* fill the cell (aspect matches photos, so nothing is lost) */
   filter: grayscale(100%);                                   /* B&W by default */
-  transition: filter .5s ease, transform .6s cubic-bezier(.2,.8,.2,1);
+  transition: filter .5s ease;
 }
-.wh-card:hover .wh-img img { filter: grayscale(0%); }   /* colour on hover (no zoom, so nothing is cut) */
+.wh-card:hover .wh-img img { filter: grayscale(0%); }   /* colour on hover */
 /* name/role reveal over the image on hover */
 .wh-cap {
   position: absolute; left: 0; right: 0; bottom: 0;
@@ -221,10 +219,10 @@ img { display: block; max-width: 100%; }
 @media (max-width: 760px) {
   /* 2 x 5 = 10 photos, fills a tall phone screen without overflowing */
   .wh-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr);   /* 2 x 5 = 10 landscape cells */
     grid-template-rows: repeat(5, 1fr);
-    aspect-ratio: 2 / 5;
-    height: min(96vh, 220vw);
+    aspect-ratio: 3 / 5;
+    height: min(88vh, 146vw);
   }
 }
 .prow {
