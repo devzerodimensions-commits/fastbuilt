@@ -3,8 +3,9 @@ import { fetchWorkers, imgWorker } from '../lib/workers'
 import { WORKFORCE_PHOTOS } from '../lib/workforcePhotos'
 
 const N = 15                // visible cells (5x3 desktop / 3x5 mobile)
-const TICK = 1300           // ms between flips (one random photo each time)
+const TICK = 2100           // ms between flip batches
 const HALF = 470            // ms half-flip (swap image at this point)
+const BATCH_MIN = 3, BATCH_MAX = 5   // how many random photos flip together each time
 const key = (x) => x?.id ?? x?.image
 const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5)
 
@@ -45,13 +46,18 @@ export default function WorkforceGrid() {
 
     const tick = () => {
       if (poolRef.current.length < 2) return
-      const i = Math.floor(Math.random() * N)          // a random cell (any row/column)
-      const next = nextPhoto()
-      if (!next) return
-      setFlip((f) => { const n = [...f]; n[i] = true; return n })       // flip out
+      const k = BATCH_MIN + Math.floor(Math.random() * (BATCH_MAX - BATCH_MIN + 1))   // 3..5 photos
+      const idxs = shuffle([...Array(N).keys()]).slice(0, k)                          // random cells (any row/col)
+      const news = idxs.map(() => nextPhoto())
+      setFlip((f) => { const n = [...f]; idxs.forEach((i) => (n[i] = true)); return n })   // flip out together
       timeouts.push(setTimeout(() => {
-        setCells((prev) => { const nc = [...prev]; nc[i] = next; cellsRef.current = nc; return nc })
-        setFlip((f) => { const n = [...f]; n[i] = false; return n })    // flip back with new photo
+        setCells((prev) => {
+          const nc = [...prev]
+          idxs.forEach((i, j) => { if (news[j]) nc[i] = news[j] })
+          cellsRef.current = nc
+          return nc
+        })
+        setFlip((f) => { const n = [...f]; idxs.forEach((i) => (n[i] = false)); return n })  // flip back with new photos
       }, HALF))
     }
 
