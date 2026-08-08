@@ -368,6 +368,10 @@ function SettingsManager({ flash }) {
               <input value={s[f.key] || ''} onChange={(e) => set(f.key, e.target.value)} />
             </div>
           ))}
+          <div className="af-row">
+            <ImageField label="Favicon (browser tab icon)" value={s.favicon} onChange={(v) => set('favicon', v)} />
+            <span className="wp-hint">Upload a small square image (PNG/ICO). Leave as-is to keep the default “F” icon.</span>
+          </div>
           <button type="submit" className="wp-btn" disabled={busy}>{busy ? 'Saving…' : 'Save changes'}</button>
         </form>
       ) : (

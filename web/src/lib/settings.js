@@ -9,6 +9,7 @@ export const SETTINGS_DEFAULTS = {
   contact_email: 'harshk@fastbuilt.in',
   contact_address: 'Gandhinagar, Gujarat',
   contact_linkedin: 'https://www.linkedin.com/company/fastbuiltenterprise/about/',
+  favicon: '/favicon.ico',
 }
 
 let _cache = null
