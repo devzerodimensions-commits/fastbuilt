@@ -186,7 +186,7 @@ img { display: block; max-width: 100%; }
 }
 .wh-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(5, 1fr);   /* 5 x 2 = 10 photos */
   grid-template-rows: repeat(2, 1fr);
   gap: 0;
   height: min(66vh, 55vw);             /* big zoomed-in hero, always fits the viewport */
@@ -219,12 +219,12 @@ img { display: block; max-width: 100%; }
 .wh-role { font-size: 10px; color: #cfcfcf; text-transform: uppercase; letter-spacing: .06em; margin-top: 3px; }
 
 @media (max-width: 760px) {
-  /* portrait 2x3 so it fills a tall phone screen without overflowing */
+  /* 2 x 5 = 10 photos, fills a tall phone screen without overflowing */
   .wh-grid {
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(3, 1fr);
-    aspect-ratio: 2 / 3;
-    height: min(72vh, 132vw);
+    grid-template-rows: repeat(5, 1fr);
+    aspect-ratio: 2 / 5;
+    height: min(96vh, 220vw);
   }
 }
 .prow {
