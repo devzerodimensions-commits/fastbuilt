@@ -173,8 +173,10 @@ img { display: block; max-width: 100%; }
 .scroll-area { will-change: transform; }
 .projects {
   margin: 0;
-  padding: 20px var(--pad) 40px;   /* workers container above provides the header spacing */
+  padding: 20px var(--pad) 40px;   /* workers hero above provides the header spacing on home */
 }
+/* category pages have no hero above, so clear the fixed header here */
+.projects.projects-standalone { padding-top: calc(62px + 44px); }
 
 /* ===================== HOME WORKERS (hero) ===================== */
 /* Zoomed-in workforce that fills the first screen (no side heading);

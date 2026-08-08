@@ -86,7 +86,7 @@ export default function Home() {
           </section>
         )}
 
-        <div className="projects">
+        <div className={`projects${active !== 'All' ? ' projects-standalone' : ''}`}>
           {filtered.map((p, i) => {
             const open = p.slug === openSlug
             return (
