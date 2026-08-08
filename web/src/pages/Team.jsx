@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import Footer from '../components/Footer'
-import { fetchTeam, imgTeam } from '../lib/team'
+import { fetchTeam, imgTeam, TEAM } from '../lib/team'
 
 export default function Team() {
-  const [team, setTeam] = useState([])
-  useEffect(() => { fetchTeam().then(setTeam) }, [])
+  const [team, setTeam] = useState(TEAM)
+  useEffect(() => { fetchTeam().then((t) => t && t.length && setTeam(t)) }, [])
 
   return (
     <>

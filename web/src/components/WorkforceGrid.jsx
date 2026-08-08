@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { fetchWorkers, imgWorker } from '../lib/workers'
+import { fetchWorkers, imgWorker, WORKERS } from '../lib/workers'
 
 const N = 6                 // visible cells (3x2 desktop / 2x3 mobile)
 const TICK = 1800           // ms between flips
@@ -8,49 +8,55 @@ const key = (x) => x?.id ?? x?.image
 
 // pick n distinct random items from pool (pads by repeating if pool is small)
 function pickDistinct(pool, n) {
-  if (!pool.length) return Array(n).fill(null)
+  if (!pool || !pool.length) return Array(n).fill(null)
   const shuffled = [...pool].sort(() => Math.random() - 0.5)
   const out = []
   for (let i = 0; i < n; i++) out.push(shuffled[i % shuffled.length])
   return out
 }
 
-// The workforce hero: cells randomly flip through the whole photo pool, so no face is permanent.
+// The workforce hero: cells randomly flip through the whole photo pool, so no face is
+// permanent. Renders instantly with bundled photos, then swaps to the live pool.
 export default function WorkforceGrid() {
-  const [cells, setCells] = useState(Array(N).fill(null))
+  const initRef = useRef(null)
+  if (!initRef.current) initRef.current = pickDistinct(WORKERS, N)
+  const [cells, setCells] = useState(initRef.current)
   const [flip, setFlip] = useState(Array(N).fill(false))
-  const poolRef = useRef([])
-  const cellsRef = useRef([])
+  const poolRef = useRef(WORKERS)
+  const cellsRef = useRef(initRef.current)
 
   useEffect(() => {
     let timer
-    const prefersReduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
+    const tick = () => {
+      const pool = poolRef.current
+      if (pool.length < 2) return
+      const i = Math.floor(Math.random() * N)
+      const shown = new Set(cellsRef.current.filter(Boolean).map(key))
+      let candidates = pool.filter((p) => !shown.has(key(p)))
+      if (!candidates.length) candidates = pool.filter((p) => key(p) !== key(cellsRef.current[i]))
+      if (!candidates.length) return
+      const next = candidates[Math.floor(Math.random() * candidates.length)]
+      setFlip((f) => { const n = [...f]; n[i] = true; return n })          // flip out
+      setTimeout(() => {
+        const nc = [...cellsRef.current]; nc[i] = next; cellsRef.current = nc
+        setCells(nc)
+        setFlip((f) => { const n = [...f]; n[i] = false; return n })       // flip back with new image
+      }, HALF)
+    }
+
+    if (!reduced && poolRef.current.length >= 2) timer = setInterval(tick, TICK)
+
+    // swap in the live pool once it loads (cold API can be slow — fallback shows meanwhile)
     fetchWorkers().then((w) => {
-      poolRef.current = w || []
-      const start = pickDistinct(poolRef.current, N)
-      cellsRef.current = start
-      setCells(start)
-
-      if (prefersReduced || poolRef.current.length < 2) return   // static if reduced-motion or too few images
-
-      const tick = () => {
-        const pool = poolRef.current
-        const i = Math.floor(Math.random() * N)
-        const shown = new Set(cellsRef.current.filter(Boolean).map(key))
-        let candidates = pool.filter((p) => !shown.has(key(p)))
-        if (!candidates.length) candidates = pool.filter((p) => key(p) !== key(cellsRef.current[i]))
-        if (!candidates.length) return
-        const next = candidates[Math.floor(Math.random() * candidates.length)]
-
-        setFlip((f) => { const n = [...f]; n[i] = true; return n })      // flip out
-        setTimeout(() => {
-          const nc = [...cellsRef.current]; nc[i] = next; cellsRef.current = nc
-          setCells(nc)
-          setFlip((f) => { const n = [...f]; n[i] = false; return n })   // flip back in with new image
-        }, HALF)
+      if (w && w.length) {
+        poolRef.current = w
+        const start = pickDistinct(w, N)
+        cellsRef.current = start
+        setCells(start)
+        if (!timer && !reduced && w.length >= 2) timer = setInterval(tick, TICK)
       }
-      timer = setInterval(tick, TICK)
     })
 
     return () => clearInterval(timer)

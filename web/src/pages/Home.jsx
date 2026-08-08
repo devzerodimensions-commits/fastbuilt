@@ -4,12 +4,14 @@ import Footer from '../components/Footer'
 import CategoryIcon from '../components/CategoryIcon'
 import InlineProject from '../components/InlineProject'
 import useHomeMotion from '../lib/useHomeMotion'
-import { fetchProjects, imgColor, imgLQIP } from '../lib/projects'
+import { fetchProjects, imgColor, imgLQIP, SAMPLE_PROJECTS } from '../lib/projects'
 import WorkforceGrid from '../components/WorkforceGrid'
 
 export default function Home() {
-  const [projects, setProjects] = useState([])
-  const [loading, setLoading] = useState(true)
+  // start with bundled data so the page renders INSTANTLY (never blank while the
+  // free API cold-starts); swap to live data when the fetch resolves.
+  const [projects, setProjects] = useState(SAMPLE_PROJECTS)
+  const [loading, setLoading] = useState(false)
   const [openSlug, setOpenSlug] = useState(null)
   const [flipFrom, setFlipFrom] = useState(null)   // clicked thumbnail's rect (for the FLIP grow)
   const [params] = useSearchParams()
@@ -18,7 +20,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchProjects().then((p) => {
-      setProjects(p)
+      if (p && p.length) setProjects(p)
       setLoading(false)
       // preload + decode the full-colour images so opening never pauses/flashes
       const warm = (src) => { const im = new Image(); im.src = src; im.decode && im.decode().catch(() => {}) }

@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import Footer from '../components/Footer'
-import { fetchWorkers, imgWorker } from '../lib/workers'
+import { fetchWorkers, imgWorker, WORKERS } from '../lib/workers'
 
 export default function Workers() {
-  const [workers, setWorkers] = useState([])
-  useEffect(() => { fetchWorkers().then(setWorkers) }, [])
+  const [workers, setWorkers] = useState(WORKERS)
+  useEffect(() => { fetchWorkers().then((w) => w && w.length && setWorkers(w)) }, [])
 
   return (
     <>
