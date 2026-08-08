@@ -543,9 +543,10 @@ img { display: block; max-width: 100%; }
 @media (max-width: 760px) { .team-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 520px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
 
-/* workers page — 4 columns, compact portrait cards */
+/* workers page — landscape cards matching the photos (full image, no crop, no bars) */
 .workers-grid { grid-template-columns: repeat(4, 1fr); gap: clamp(10px, 1.2vw, 18px); }
-.workers-grid .team-img { aspect-ratio: 4 / 5; }
+.workers-grid .team-img { aspect-ratio: 3 / 2; }
+.workers-grid .team-card:hover .team-img img { transform: none; }   /* no zoom so nothing is cut */
 @media (max-width: 900px) { .workers-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 620px) { .workers-grid { grid-template-columns: repeat(2, 1fr); } }
 

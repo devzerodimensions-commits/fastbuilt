@@ -1,27 +1,23 @@
 import { apiUrl } from './api'
+import { WORKFORCE_PHOTOS } from './workforcePhotos'
 
-// Fallback workers (used if the API is unreachable). Real data comes from /api/workers.
-export const WORKERS = [
-  { name: 'Ramesh Patel', role: 'Senior Mason', image: 'worker1' },
-  { name: 'Sita Ben', role: 'Steel Fixer', image: 'worker2' },
-  { name: 'Imran Shaikh', role: 'Site Supervisor', image: 'worker3' },
-  { name: 'On-site Crew', role: 'Erection Team', image: 'worker4' },
-  { name: 'Mahesh Rana', role: 'Shuttering Carpenter', image: 'worker5' },
-  { name: 'Dinesh Chauhan', role: 'Concrete Foreman', image: 'worker6' },
-]
+// The real workforce photos (bundled WebP) are the base set.
+export const WORKERS = WORKFORCE_PHOTOS
 
 const isUrl = (v) => typeof v === 'string' && (/^https?:\/\//.test(v) || v.startsWith('/'))
-// accepts a full URL, or a legacy key -> /images/workers/<key>.jpg
+// accepts a full URL / path, or a legacy key -> /images/workers/<key>.jpg
 export function imgWorker(k) { return isUrl(k) ? k : `/images/workers/${k}.jpg` }
 
+// Pool = bundled real photos + real dashboard-added workers (Cloudinary URLs).
+// Legacy sample rows (plain keys like "worker1") are excluded.
 export async function fetchWorkers() {
   try {
     const res = await fetch(apiUrl('/api/workers'))
-    if (!res.ok) throw new Error('bad status')
-    const data = await res.json()
-    if (Array.isArray(data) && data.length) return data
-    throw new Error('empty')
+    const data = res.ok ? await res.json() : []
+    const db = Array.isArray(data) ? data.filter((x) => x && x.image && /^https?:\/\//.test(x.image)) : []
+    const seen = new Set(WORKFORCE_PHOTOS.map((p) => p.image))
+    return [...WORKFORCE_PHOTOS, ...db.filter((x) => !seen.has(x.image))]
   } catch {
-    return WORKERS
+    return WORKFORCE_PHOTOS
   }
 }
