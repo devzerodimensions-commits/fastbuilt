@@ -5,6 +5,7 @@ import projectsRouter from './routes/projects.js'
 import authRouter from './routes/auth.js'
 import peopleCrud from './routes/peopleCrud.js'
 import categoriesRouter from './routes/categories.js'
+import { ensureAdminTable } from './bootstrap.js'
 
 dotenv.config()
 
@@ -24,6 +25,9 @@ app.use((err, _req, res, _next) => {
   console.error(err)
   res.status(500).json({ error: 'server error' })
 })
+
+// make sure the admin account exists (idempotent) before/while serving requests
+ensureAdminTable().catch((e) => console.error('admin bootstrap failed:', e.message))
 
 const PORT = Number(process.env.PORT || 4000)
 app.listen(PORT, () => console.log(`Fastbuilt API on http://localhost:${PORT}`))

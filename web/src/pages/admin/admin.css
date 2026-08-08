@@ -13,8 +13,9 @@
 /* ---------- login ---------- */
 .admin-login { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--wp-gray); padding: 24px; }
 .admin-login-card { width: 100%; max-width: 360px; background: #fff; border: 1px solid var(--wp-line); border-radius: 8px; padding: 32px; display: flex; flex-direction: column; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+.admin-logo { display: block; height: 40px; width: auto; object-fit: contain; margin: 4px auto 14px; }
 .admin-login-card h1 { font-size: 22px; margin: 0 0 4px; }
-.admin-login-card p { color: #646970; font-size: 14px; margin: 0 0 20px; }
+.admin-login-card p { color: #646970; font-size: 14px; margin: 0 0 20px; text-align: center; }
 .admin-login-card label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: #646970; margin: 12px 0 6px; }
 .admin-login-card input { padding: 10px 12px; border: 1px solid #8c8f94; border-radius: 4px; font-size: 15px; }
 .admin-login-card input:focus { outline: none; border-color: var(--wp-blue); box-shadow: 0 0 0 1px var(--wp-blue); }
@@ -22,6 +23,9 @@
 .admin-login-card button:hover { background: var(--wp-blue-d); }
 .admin-login-card button:disabled { opacity: .6; }
 .af-err { color: #b32d2e; font-size: 13px; margin-top: 8px; }
+.admin-link { display: block; text-align: center; margin-top: 16px; color: #646970; font-size: 13px; text-decoration: none; }
+.admin-link:hover { color: var(--wp-text); text-decoration: underline; }
+.admin-note { color: #646970; font-size: 13px; margin: 0 0 4px; text-align: center; }
 
 /* ---------- shell ---------- */
 .wp { display: flex; min-height: 100vh; background: var(--wp-gray); }

@@ -43,3 +43,14 @@ CREATE TABLE IF NOT EXISTS categories (
 
 -- second image column for older databases that predate it
 ALTER TABLE projects ADD COLUMN IF NOT EXISTS image2 TEXT;
+
+-- admin account(s) for the dashboard — password stored hashed, plus reset-token fields
+CREATE TABLE IF NOT EXISTS admins (
+  id            SERIAL PRIMARY KEY,
+  username      TEXT UNIQUE NOT NULL,
+  email         TEXT,
+  password_hash TEXT NOT NULL,
+  reset_token   TEXT,
+  reset_expires TIMESTAMPTZ,
+  created_at    TIMESTAMPTZ DEFAULT now()
+);

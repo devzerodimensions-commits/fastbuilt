@@ -7,6 +7,8 @@ import Workers from './pages/Workers'
 import PageTransition from './components/PageTransition'
 import IntroLoader from './components/IntroLoader'
 import AdminLogin from './pages/admin/AdminLogin'
+import AdminForgot from './pages/admin/AdminForgot'
+import AdminReset from './pages/admin/AdminReset'
 import AdminDashboard from './pages/admin/AdminDashboard'
 
 export default function App() {
@@ -20,6 +22,8 @@ export default function App() {
     return (
       <Routes>
         <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/forgot" element={<AdminForgot />} />
+        <Route path="/admin/reset" element={<AdminReset />} />
         <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
     )

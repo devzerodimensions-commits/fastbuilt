@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { login } from '../../lib/api'
 import './admin.css'
 
@@ -26,7 +26,7 @@ export default function AdminLogin() {
   return (
     <div className="admin-login">
       <form className="admin-login-card" onSubmit={onSubmit}>
-        <h1>Fastbuilt Admin</h1>
+        <img src="/logo.png" alt="Fastbuilt" className="admin-logo" />
         <p>Sign in to manage the website content.</p>
         <label>Username</label>
         <input value={username} onChange={(e) => setUsername(e.target.value)} autoFocus />
@@ -34,6 +34,7 @@ export default function AdminLogin() {
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
         {err && <div className="af-err">{err}</div>}
         <button type="submit" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button>
+        <Link className="admin-link" to="/admin/forgot">Lost your password?</Link>
       </form>
     </div>
   )

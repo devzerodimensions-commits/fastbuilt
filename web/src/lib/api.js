@@ -30,6 +30,13 @@ export async function login(username, password) {
   return data
 }
 
+// WordPress-style password recovery
+export const forgotPassword = (identifier) =>
+  request('/api/auth/forgot', { method: 'POST', body: { identifier } })
+export const resetPassword = (token, password) =>
+  request('/api/auth/reset', { method: 'POST', body: { token, password } })
+export const authConfig = () => request('/api/auth/config')
+
 // ---- generic CRUD for a resource (projects / workers / team) ----
 export const listItems = (resource) => request(`/api/${resource}`)
 export const createItem = (resource, body) => request(`/api/${resource}`, { method: 'POST', body, auth: true })
