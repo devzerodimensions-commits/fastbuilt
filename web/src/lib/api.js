@@ -51,6 +51,12 @@ export const changePassword = (currentPassword, newPassword) =>
 export const getSettings = () => request('/api/settings')
 export const saveSettings = (body) => request('/api/settings', { method: 'PUT', body, auth: true })
 
+// media library
+export const listMedia = () => request('/api/media', { auth: true })
+export const createMedia = (body) => request('/api/media', { method: 'POST', body, auth: true })
+export const updateMedia = (id, body) => request(`/api/media/${id}`, { method: 'PUT', body, auth: true })
+export const deleteMedia = (id) => request(`/api/media/${id}`, { method: 'DELETE', auth: true })
+
 // ---- generic CRUD for a resource (projects / workers / team / users) ----
 export const listItems = (resource, auth = false) => request(`/api/${resource}`, { auth })
 export const createItem = (resource, body) => request(`/api/${resource}`, { method: 'POST', body, auth: true })
@@ -61,7 +67,7 @@ export const deleteItem = (resource, id) => request(`/api/${resource}/${id}`, { 
 export const cloudinaryConfigured = () =>
   !!(import.meta.env.VITE_CLOUDINARY_CLOUD_NAME && import.meta.env.VITE_CLOUDINARY_PRESET)
 
-export async function uploadImage(file) {
+export async function uploadImageFull(file) {
   const cloud = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
   const preset = import.meta.env.VITE_CLOUDINARY_PRESET
   if (!cloud || !preset) throw new Error('Cloudinary not configured')
@@ -71,5 +77,10 @@ export async function uploadImage(file) {
   const res = await fetch(`https://api.cloudinary.com/v1_1/${cloud}/image/upload`, { method: 'POST', body: form })
   const data = await res.json()
   if (!res.ok || !data.secure_url) throw new Error(data.error?.message || 'Upload failed')
+  return data // { secure_url, public_id, width, height, bytes, format, original_filename, ... }
+}
+
+export async function uploadImage(file) {
+  const data = await uploadImageFull(file)
   return data.secure_url
 }

@@ -125,6 +125,48 @@
 .wp-settings .wp-btn { margin-top: 8px; }
 .wp-hint { display: block; margin-top: 6px; font-size: 12px; color: #646970; }
 
+/* ---------- media library ---------- */
+.media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+.media-cell { padding: 0; border: 1px solid var(--wp-line); border-radius: 6px; overflow: hidden; background: #f6f7f7; cursor: pointer; aspect-ratio: 1/1; }
+.media-cell img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .2s; }
+.media-cell:hover img { transform: scale(1.04); }
+.media-cell:hover { border-color: var(--wp-text); }
+
+.media-details { width: 100%; max-width: 860px; background: #fff; border-radius: 10px; overflow: hidden; display: grid; grid-template-columns: 1.2fr 1fr; }
+.media-details-preview { background: #1d2327; display: flex; align-items: center; justify-content: center; padding: 18px; }
+.media-details-preview img { max-width: 100%; max-height: 60vh; object-fit: contain; }
+.media-details-info { padding: 22px; display: flex; flex-direction: column; }
+.mdi-head { display: flex; align-items: center; justify-content: space-between; }
+.mdi-head h3 { margin: 0; font-size: 18px; }
+.mdi-x { background: transparent; border: none; font-size: 26px; line-height: 1; color: #646970; cursor: pointer; }
+.mdi-file { font-weight: 600; word-break: break-all; margin: 10px 0 14px; }
+.mdi-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin: 0 0 16px; }
+.mdi-meta dt { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #646970; }
+.mdi-meta dd { margin: 0; font-size: 14px; }
+.mdi-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; color: #646970; margin: 10px 0 4px; }
+.mdi-alt { padding: 8px 10px; border: 1px solid #8c8f94; border-radius: 4px; font-size: 14px; }
+.mdi-url { display: flex; gap: 6px; }
+.mdi-url input { flex: 1; padding: 8px 10px; border: 1px solid #8c8f94; border-radius: 4px; font-size: 12px; color: #646970; }
+.mdi-url button { background: #f6f7f7; border: 1px solid var(--wp-line); border-radius: 4px; padding: 0 12px; cursor: pointer; font-size: 13px; }
+.mdi-actions { display: flex; align-items: center; gap: 10px; margin-top: auto; padding-top: 18px; flex-wrap: wrap; }
+.wp-btn.ghost { background: #fff; color: var(--wp-text); border: 1px solid var(--wp-line); }
+.mdi-del { margin-left: auto; background: transparent; border: none; color: #b32d2e; cursor: pointer; font-size: 13px; }
+.mdi-del:hover { text-decoration: underline; }
+
+.media-editor { width: 100%; max-width: 720px; background: #fff; border-radius: 10px; padding: 20px; }
+.media-crop-area { position: relative; width: 100%; height: 380px; background: #1d2327; border-radius: 8px; overflow: hidden; margin: 14px 0; }
+.media-tools { display: flex; flex-direction: column; gap: 10px; }
+.mt-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.mt-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; color: #646970; margin-right: 2px; }
+.mt-row button { background: #f6f7f7; border: 1px solid var(--wp-line); border-radius: 4px; padding: 6px 12px; font-size: 13px; cursor: pointer; }
+.mt-row button.active { background: var(--wp-text); color: #fff; border-color: var(--wp-text); }
+.mt-row input[type="range"] { flex: 1; accent-color: var(--wp-text); }
+
+@media (max-width: 720px) {
+  .media-details { grid-template-columns: 1fr; max-width: 460px; }
+  .media-details-preview img { max-height: 34vh; }
+}
+
 /* ---------- image field ---------- */
 .af-image > label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; color: #646970; margin-bottom: 6px; display: block; }
 .af-image-row { display: flex; gap: 12px; align-items: flex-start; }

@@ -6,6 +6,7 @@ import {
 } from '../../lib/api'
 import { CATEGORIES } from '../../lib/projects'
 import ImageField from './ImageField'
+import MediaLibrary from './MediaLibrary'
 import './admin.css'
 
 const RESOURCES = {
@@ -75,6 +76,7 @@ const ICONS = {
   team: <path d="M8 11a3 3 0 100-6 3 3 0 000 6zm8 0a3 3 0 100-6 3 3 0 000 6zM2 19c0-2.5 3-4 6-4s6 1.5 6 4v1H2v-1zm12.5-3.9c2.3.4 4.5 1.7 4.5 3.9v1h3v-1c0-2.3-3.2-3.6-6-3.9z" />,
   categories: <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z" />,
   users: <path d="M8 11a3 3 0 100-6 3 3 0 000 6zm8 0a3 3 0 100-6 3 3 0 000 6zM2 19c0-2.5 3-4 6-4s6 1.5 6 4v1H2v-1zm12.5-3.9c2.3.4 4.5 1.7 4.5 3.9v1h3v-1c0-2.3-3.2-3.6-6-3.9z" />,
+  media: <path d="M21 3H3a2 2 0 00-2 2v14a2 2 0 002 2h18a2 2 0 002-2V5a2 2 0 00-2-2zM8.5 8a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM5 19l4-5 3 3.5L15 13l4 6H5z" />,
   settings: <path d="M12 8a4 4 0 100 8 4 4 0 000-8zm8.94 4a7 7 0 00-.15-1.4l2.02-1.58-2-3.46-2.39.96a7 7 0 00-2.42-1.4L15.6 2h-4l-.4 2.72a7 7 0 00-2.42 1.4l-2.39-.96-2 3.46 2.02 1.58a7 7 0 000 2.8L2 14.58l2 3.46 2.39-.96a7 7 0 002.42 1.4L11.6 22h4l.4-2.72a7 7 0 002.42-1.4l2.39.96 2-3.46-2.02-1.58c.1-.46.15-.93.15-1.4z" />,
 }
 const Icon = ({ name }) => (
@@ -99,6 +101,7 @@ export default function AdminDashboard() {
       const [p, w, t, c] = await Promise.all([listItems('projects'), listItems('workers'), listItems('team'), listItems('categories')])
       const next = { projects: p.length, workers: w.length, team: t.length, categories: c.length }
       setCatOptions(c.map((x) => x.name))
+      try { const m = await listItems('media', true); next.media = m.length } catch { /* ignore */ }
       try { const u = await listItems('users', true); next.users = u.length } catch { /* non-admin */ }
       setCounts(next)
     } catch { setCounts({ projects: 0, workers: 0, team: 0, categories: 0 }) }
@@ -115,13 +118,14 @@ export default function AdminDashboard() {
     { key: 'workers', label: 'Workers', icon: 'workers' },
     { key: 'team', label: 'Team', icon: 'team' },
     { key: 'categories', label: 'Categories', icon: 'categories' },
+    { key: 'media', label: 'Media', icon: 'media' },
     ...(isAdmin ? [
       { key: 'users', label: 'Users', icon: 'users' },
       { key: 'settings', label: 'Settings', icon: 'settings' },
     ] : []),
   ]
 
-  const crumb = view === 'dashboard' ? 'Dashboard' : view === 'settings' ? 'Settings' : RESOURCES[view].label
+  const crumb = view === 'dashboard' ? 'Dashboard' : view === 'settings' ? 'Settings' : view === 'media' ? 'Media Library' : RESOURCES[view].label
 
   return (
     <div className="wp">
@@ -149,7 +153,8 @@ export default function AdminDashboard() {
         <main className="wp-main">
           {view === 'dashboard' && <Overview counts={counts} go={setView} isAdmin={isAdmin} />}
           {view === 'settings' && <SettingsManager flash={flash} />}
-          {view !== 'dashboard' && view !== 'settings' && (
+          {view === 'media' && <MediaLibrary flash={flash} onChanged={loadCounts} />}
+          {view !== 'dashboard' && view !== 'settings' && view !== 'media' && (
             <ResourceManager key={view} resource={RESOURCES[view].resource || view} cfg={RESOURCES[view]} onChanged={loadCounts} flash={flash} categoryOptions={catOptions} />
           )}
         </main>
@@ -166,6 +171,7 @@ function Overview({ counts, go, isAdmin }) {
     { key: 'workers', label: 'Workers', icon: 'workers', color: '#3c434a' },
     { key: 'team', label: 'Team', icon: 'team', color: '#646970' },
     { key: 'categories', label: 'Categories', icon: 'categories', color: '#8c8f94' },
+    { key: 'media', label: 'Media', icon: 'media', color: '#3c434a' },
     ...(isAdmin ? [{ key: 'users', label: 'Users', icon: 'users', color: '#1d2327' }] : []),
   ]
   return (

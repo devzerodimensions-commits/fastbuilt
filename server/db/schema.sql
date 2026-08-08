@@ -64,3 +64,17 @@ CREATE TABLE IF NOT EXISTS settings (
   key   TEXT PRIMARY KEY,
   value TEXT
 );
+
+-- media library (dashboard uploads)
+CREATE TABLE IF NOT EXISTS media (
+  id          SERIAL PRIMARY KEY,
+  url         TEXT NOT NULL,
+  public_id   TEXT,
+  filename    TEXT,
+  format      TEXT,
+  width       INTEGER,
+  height      INTEGER,
+  bytes       INTEGER,
+  alt         TEXT,
+  created_at  TIMESTAMPTZ DEFAULT now()
+);

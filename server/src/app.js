@@ -7,6 +7,7 @@ import peopleCrud from './routes/peopleCrud.js'
 import categoriesRouter from './routes/categories.js'
 import usersRouter from './routes/users.js'
 import settingsRouter from './routes/settings.js'
+import mediaRouter from './routes/media.js'
 import { ensureAdminTable } from './bootstrap.js'
 
 dotenv.config()
@@ -23,6 +24,7 @@ app.use('/api/team', peopleCrud('team'))
 app.use('/api/categories', categoriesRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/settings', settingsRouter)
+app.use('/api/media', mediaRouter)
 
 // eslint-disable-next-line no-unused-vars
 app.use((err, _req, res, _next) => {

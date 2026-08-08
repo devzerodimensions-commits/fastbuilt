@@ -30,6 +30,14 @@ export async function ensureAdminTable() {
   await pool.query(`ALTER TABLE admins ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'administrator'`)
   await pool.query(`ALTER TABLE admins ADD COLUMN IF NOT EXISTS name TEXT`)
 
+  // media library
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS media (
+      id SERIAL PRIMARY KEY, url TEXT NOT NULL, public_id TEXT, filename TEXT, format TEXT,
+      width INTEGER, height INTEGER, bytes INTEGER, alt TEXT, created_at TIMESTAMPTZ DEFAULT now()
+    );
+  `)
+
   // key/value site settings (managed from the dashboard Settings page)
   await pool.query(`CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT)`)
   for (const [k, v] of Object.entries(SETTINGS_DEFAULTS)) {

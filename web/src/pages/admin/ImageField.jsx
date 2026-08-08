@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { uploadImage, cloudinaryConfigured } from '../../lib/api'
+import { uploadImageFull, createMedia, cloudinaryConfigured } from '../../lib/api'
 import { imgColor } from '../../lib/projects'
 
 // Convert ANY chosen image to optimized WebP (resized) before uploading — so every
@@ -36,8 +36,10 @@ export default function ImageField({ label, value, onChange }) {
     setErr(''); setBusy(true)
     try {
       const webp = await fileToWebp(file)      // always upload as WebP
-      const url = await uploadImage(webp)
-      onChange(url)
+      const up = await uploadImageFull(webp)
+      onChange(up.secure_url)
+      // best-effort: also register in the Media Library so every upload shows up there
+      createMedia({ url: up.secure_url, public_id: up.public_id, filename: file.name, format: up.format, width: up.width, height: up.height, bytes: up.bytes }).catch(() => {})
     } catch (ex) {
       setErr(ex.message)
     } finally {
