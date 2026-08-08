@@ -4,9 +4,14 @@ const API_BASE = import.meta.env.VITE_API_URL || ''      // e.g. http://localhos
 export const apiUrl = (path) => `${API_BASE}${path}`
 
 const TOKEN_KEY = 'fb_admin_token'
-export const getToken = () => localStorage.getItem(TOKEN_KEY)
-export const setToken = (t) => localStorage.setItem(TOKEN_KEY, t)
-export const clearToken = () => localStorage.removeItem(TOKEN_KEY)
+export const getToken = () => localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY)
+// "Remember Me" -> persist in localStorage (survives browser close);
+// otherwise sessionStorage (cleared when the browser/tab closes).
+export const setToken = (t, remember = true) => {
+  localStorage.removeItem(TOKEN_KEY); sessionStorage.removeItem(TOKEN_KEY)
+  ;(remember ? localStorage : sessionStorage).setItem(TOKEN_KEY, t)
+}
+export const clearToken = () => { localStorage.removeItem(TOKEN_KEY); sessionStorage.removeItem(TOKEN_KEY) }
 export const isLoggedIn = () => !!getToken()
 
 async function request(path, { method = 'GET', body, auth = false } = {}) {
@@ -24,9 +29,9 @@ async function request(path, { method = 'GET', body, auth = false } = {}) {
 }
 
 // ---- auth ----
-export async function login(username, password) {
+export async function login(username, password, remember = true) {
   const data = await request('/api/auth/login', { method: 'POST', body: { username, password } })
-  setToken(data.token)
+  setToken(data.token, remember)
   return data
 }
 

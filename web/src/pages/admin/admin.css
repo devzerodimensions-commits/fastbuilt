@@ -19,12 +19,24 @@
 .admin-login-card label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: #646970; margin: 12px 0 6px; }
 .admin-login-card input { padding: 10px 12px; border: 1px solid #8c8f94; border-radius: 4px; font-size: 15px; }
 .admin-login-card input:focus { outline: none; border-color: var(--wp-blue); box-shadow: 0 0 0 1px var(--wp-blue); }
-.admin-login-card button { margin-top: 22px; padding: 11px; background: var(--wp-blue); color: #fff; border: none; border-radius: 4px; font-size: 15px; font-weight: 600; cursor: pointer; }
-.admin-login-card button:hover { background: var(--wp-blue-d); }
-.admin-login-card button:disabled { opacity: .6; }
+.admin-login-card button[type="submit"] { margin-top: 22px; padding: 11px; background: var(--wp-blue); color: #fff; border: none; border-radius: 4px; font-size: 15px; font-weight: 600; cursor: pointer; }
+.admin-login-card button[type="submit"]:hover { background: var(--wp-blue-d); }
+.admin-login-card button[type="submit"]:disabled { opacity: .6; }
 .af-err { color: #b32d2e; font-size: 13px; margin-top: 8px; }
 .admin-link { display: block; text-align: center; margin-top: 16px; color: #2271b1; font-size: 13px; text-decoration: none; }
 .admin-link:hover { color: #135e96; text-decoration: underline; }
+
+/* password field with show/hide eye */
+.admin-pw { position: relative; display: flex; }
+.admin-pw input { flex: 1; padding-right: 42px; width: 100%; }
+.admin-pw-eye { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; background: transparent; border: none; color: #646970; cursor: pointer; padding: 0; }
+.admin-pw-eye:hover { color: var(--wp-text); }
+
+/* Remember Me + Log In on one row (WordPress-style) */
+.admin-row { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; gap: 12px; }
+.admin-check { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 13px; font-weight: 400; color: var(--wp-text); text-transform: none; letter-spacing: 0; cursor: pointer; }
+.admin-check input { width: 16px; height: 16px; margin: 0; padding: 0; accent-color: var(--wp-text); cursor: pointer; }
+.admin-signin { margin-top: 0 !important; padding: 10px 22px !important; }
 .admin-note { color: #646970; font-size: 13px; margin: 0 0 4px; text-align: center; }
 
 /* ---------- shell ---------- */
