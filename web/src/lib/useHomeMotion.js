@@ -16,6 +16,11 @@ export default function useHomeMotion(scaleRef, deps = []) {
     let vel = 0
     lenis.on('scroll', ({ velocity }) => { vel = velocity })
 
+    // Recalculate lenis' scroll limit whenever the page height changes (project open/close,
+    // images loading, workforce hero, etc.) — otherwise the footer becomes unreachable.
+    const ro = new ResizeObserver(() => lenis.resize())
+    ro.observe(document.body)
+
     // cached images may skip onLoad -> make sure they show
     wrap.querySelectorAll('.pimg img').forEach((im) => {
       if (im.complete && im.naturalWidth > 0) im.classList.add('loaded')
@@ -57,6 +62,7 @@ export default function useHomeMotion(scaleRef, deps = []) {
 
     return () => {
       cancelAnimationFrame(raf)
+      ro.disconnect()
       if (window.__lenis === lenis) window.__lenis = null
       lenis.destroy()
       if (scaleTarget) { scaleTarget.style.transform = ''; scaleTarget.style.transformOrigin = '' }

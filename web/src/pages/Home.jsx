@@ -28,6 +28,8 @@ export default function Home() {
         warm(imgColor(pr.image))
         if (pr.image2) warm(imgColor(pr.image2))
       })
+      // content just changed height -> refresh smooth-scroll limit so the footer is reachable
+      setTimeout(() => window.__lenis?.resize(), 300)
     })
   }, [])
 
@@ -55,8 +57,9 @@ export default function Home() {
   // centre the opened project vertically in the viewport (works with the FLIP,
   // since scrolling moves everything uniformly)
   useEffect(() => {
-    if (!openSlug) return
     const t = setTimeout(() => {
+      window.__lenis?.resize()          // page height changed (open/close) -> refresh scroll limit so the footer stays reachable
+      if (!openSlug) return
       const el = document.querySelector('.pitem.open')
       if (!el) return
       let absTop = 0
@@ -67,7 +70,7 @@ export default function Home() {
       const targetY = Math.max(0, absTop - headerH - Math.max(0, (vh - headerH - finalH) / 2))
       if (window.__lenis) window.__lenis.scrollTo(targetY, { duration: 1.2 })
       else window.scrollTo({ top: targetY, behavior: 'smooth' })
-    }, 30)
+    }, 60)
     return () => clearTimeout(t)
   }, [openSlug])
 
