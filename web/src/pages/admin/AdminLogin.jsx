@@ -34,7 +34,7 @@ export default function AdminLogin() {
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
         {err && <div className="af-err">{err}</div>}
         <button type="submit" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button>
-        <Link className="admin-link" to="/admin/forgot">Lost your password?</Link>
+        <Link className="admin-link" to="/admin/forgot">Forgot your password?</Link>
       </form>
     </div>
   )

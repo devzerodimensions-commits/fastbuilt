@@ -23,8 +23,8 @@
 .admin-login-card button:hover { background: var(--wp-blue-d); }
 .admin-login-card button:disabled { opacity: .6; }
 .af-err { color: #b32d2e; font-size: 13px; margin-top: 8px; }
-.admin-link { display: block; text-align: center; margin-top: 16px; color: #646970; font-size: 13px; text-decoration: none; }
-.admin-link:hover { color: var(--wp-text); text-decoration: underline; }
+.admin-link { display: block; text-align: center; margin-top: 16px; color: #2271b1; font-size: 13px; text-decoration: none; }
+.admin-link:hover { color: #135e96; text-decoration: underline; }
 .admin-note { color: #646970; font-size: 13px; margin: 0 0 4px; text-align: center; }
 
 /* ---------- shell ---------- */
