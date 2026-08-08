@@ -51,7 +51,6 @@ export default function Header() {
 
         {menuOpen && (
           <div className="menu-dropdown">
-            <Link to="/" onClick={() => setMenuOpen(false)}>All Projects</Link>
             {categories.map((c) => (
               <Link
                 key={c}
