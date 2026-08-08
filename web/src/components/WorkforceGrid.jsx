@@ -49,6 +49,12 @@ export default function WorkforceGrid() {
       const k = BATCH_MIN + Math.floor(Math.random() * (BATCH_MAX - BATCH_MIN + 1))   // 3..5 photos
       const idxs = shuffle([...Array(N).keys()]).slice(0, k)                          // random cells (any row/col)
       const news = idxs.map(() => nextPhoto())
+      // if the pool has no fresh photo (all already on screen), shuffle these cells'
+      // own photos among themselves so it still moves — never duplicates a face
+      if (news.some((x) => !x)) {
+        const cur = shuffle(idxs.map((i) => cellsRef.current[i]))
+        for (let j = 0; j < idxs.length; j++) news[j] = cur[j]
+      }
       setFlip((f) => { const n = [...f]; idxs.forEach((i) => (n[i] = true)); return n })   // flip out together
       timeouts.push(setTimeout(() => {
         setCells((prev) => {

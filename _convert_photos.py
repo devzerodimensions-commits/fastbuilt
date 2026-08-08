@@ -19,28 +19,33 @@ files = sorted(set(files))
 
 def parse(fname):
     base = os.path.splitext(os.path.basename(fname))[0].strip()
-    m = re.match(r"^\d+[_\s]+(.*)$", base)          # leading number like "01_"
+    m = re.match(r"^\d+[_\s]+(.*)$", base)          # leading number like "01_" => has a name
     if m:
         rest = m.group(1).strip()
         parts = [p for p in re.split(r"[_\s]+", rest) if p]
-        name = parts[0] if parts else "Fastbuilt Crew"
+        if not parts:
+            return None
+        name = parts[0]
         role = " ".join(parts[1:]).strip() if len(parts) > 1 else "On-site Team"
         return name, role
-    if base.upper().startswith("DSC"):
-        return "Fastbuilt Crew", "On-site Team"
-    parts = [p for p in re.split(r"[_\s]+", base) if p]
-    return (parts[0] if parts else "Fastbuilt Crew"), "On-site Team"
+    return None                                     # no real name (DSC etc.) -> skip
 
 entries = []
-for i, f in enumerate(files, 1):
+n = 0
+for f in files:
+    p = parse(f)
+    if not p:
+        print("  skip (no name):", os.path.basename(f))
+        continue
     try:
         im = Image.open(f)
         im = ImageOps.exif_transpose(im)            # honour camera rotation
         im = im.convert("RGB")
         im.thumbnail((MAX, MAX), Image.LANCZOS)
-        out_name = f"w{i:03d}.webp"
+        n += 1
+        out_name = f"w{n:03d}.webp"
         im.save(os.path.join(OUT, out_name), "WEBP", quality=Q, method=6)
-        name, role = parse(f)
+        name, role = p
         entries.append({"name": name, "role": role, "image": f"/images/workforce/{out_name}"})
         print(f"  {os.path.basename(f)} -> {out_name}  ({name} / {role})")
     except Exception as e:
