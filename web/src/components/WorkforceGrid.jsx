@@ -3,9 +3,8 @@ import { fetchWorkers, imgWorker } from '../lib/workers'
 import { WORKFORCE_PHOTOS } from '../lib/workforcePhotos'
 
 const N = 15                // visible cells (5x3 desktop / 3x5 mobile)
-const TICK = 4200           // ms between fade batches
+const TICK = 3600           // ms between full crossfades
 const FADE = 1200           // ms crossfade (matches the CSS whFadeIn)
-const BATCH_MIN = 3, BATCH_MAX = 5
 const key = (x) => x?.id ?? x?.image
 const shuffle = (arr) => [...arr].sort(() => Math.random() - 0.5)
 
@@ -34,33 +33,13 @@ export default function WorkforceGrid() {
     const timeouts = []
     const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
-    const nextPhoto = () => {
-      const shown = new Set()
-      baseRef.current.forEach((x) => x && shown.add(key(x)))
-      topRef.current.forEach((x) => x && shown.add(key(x)))
-      for (let g = 0; g < poolRef.current.length + 2; g++) {
-        if (!queueRef.current.length) queueRef.current = shuffle(poolRef.current)
-        const cand = queueRef.current.shift()
-        if (cand && !shown.has(key(cand))) return cand
-      }
-      return null
-    }
-
     const tick = () => {
       if (poolRef.current.length < 2) return
-      const k = BATCH_MIN + Math.floor(Math.random() * (BATCH_MAX - BATCH_MIN + 1))
-      const idxs = shuffle([...Array(N).keys()]).slice(0, k)
-      const news = idxs.map(() => nextPhoto())
-      if (news.some((x) => !x)) {                          // pool full -> shuffle these cells' own photos
-        const cur = shuffle(idxs.map((i) => baseRef.current[i]))
-        for (let j = 0; j < idxs.length; j++) news[j] = cur[j]
-      }
-      // start crossfade: incoming photos fade in on top
-      setTop((t) => { const n = [...t]; idxs.forEach((i, j) => (n[i] = news[j])); topRef.current = n; return n })
+      const ns = shuffle(poolRef.current).slice(0, N)      // N unique photos (all cells change together)
+      setTop(() => { topRef.current = ns.slice(); return ns.slice() })   // all incoming fade in at once
       timeouts.push(setTimeout(() => {
-        // promote: incoming becomes the base, clear the top layer (seamless)
-        setBase((b) => { const nb = [...b]; idxs.forEach((i, j) => { if (news[j]) nb[i] = news[j] }); baseRef.current = nb; return nb })
-        setTop((t) => { const n = [...t]; idxs.forEach((i) => (n[i] = null)); topRef.current = n; return n })
+        setBase(() => { baseRef.current = ns.slice(); return ns.slice() })
+        setTop(() => { const n = Array(N).fill(null); topRef.current = n; return n })
       }, FADE))
     }
 
